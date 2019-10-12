@@ -9,7 +9,7 @@ const userRoutes = require('./api/routes/user.route');
 const app = express();
 
 const yo = mongoose.connect(
-    '',
+    'mongodb+srv://gameplex-user:pg60EeT5o8NtQEDa@cluster0-jnmvx.mongodb.net/test?retryWrites=true&w=majority',
     {
         useNewUrlParser: true
     }
