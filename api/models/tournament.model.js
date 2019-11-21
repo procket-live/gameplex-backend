@@ -2,18 +2,16 @@ const mongoose = require('mongoose');
 
 const tournamentSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    status: { type: String },
+    active: { type: Boolean, default: false },
+    status: { type: String, enum: ['draft', 'active'], default: 'draft' },
     tournament_name: String,
-    tournament_complete_name: String,
     logo: String,
     description: String,
     prize: {},
     game: { ref: mongoose.Schema.Types.ObjectId, ref: 'Game', require: true },
-    platform: [{ ref: mongoose.Schema.Types.ObjectId, ref: 'Platform', require: true }],
+    platform: String,
     size: Number,
-    participent_type: { type: String },
     registration: {
-        is_active: Boolean,
         registration_opening: Date,
         registration_closing: Date,
         form_message: String,
@@ -21,7 +19,7 @@ const tournamentSchema = mongoose.Schema({
         tnc_link: String
     },
     created_at: Date,
-    expires_at: Date,
+    updated_at: Date,
     created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 
