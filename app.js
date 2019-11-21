@@ -53,8 +53,20 @@ const adminBro = new AdminBro({
 
 const adminBroRouter = AdminBroExpressjs.buildAuthenticatedRouter(adminBro, {
     authenticate: async (email, password) => {
-        const user = await userModel.findOne({ email })
+        const user = await userModel.findOne({ email }).populate('role')
         if (user) {
+            let isAdmin = false;
+            const roles = user.role || [];
+            roles.forEach((role) => {
+                if (role.name == 'Admin') {
+                    isAdmin = true;
+                }
+            })
+
+            if (!isAdmin) {
+                return false;
+            }
+
             const matched = password == user.password;
             if (matched) {
                 return user
