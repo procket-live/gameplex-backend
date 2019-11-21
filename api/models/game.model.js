@@ -14,8 +14,8 @@ const gameSchema = mongoose.Schema({
         required: { type: Boolean, default: true }
     }],
     price_meta: [{ key: String, dataType: String }],
-    created_at: Date,
-    updated_at: Date,
+    created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date, default: Date.now },
     created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 });
 

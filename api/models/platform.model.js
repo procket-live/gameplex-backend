@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const platformSchema = mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
+    _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
     name: String,
     icon: String,
     description: String,

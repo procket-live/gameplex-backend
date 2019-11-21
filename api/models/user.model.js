@@ -8,11 +8,14 @@ const userSchema = mongoose.Schema({
         require: true,
         unique: true,
     },
-    email: { type: String, unique: true, require: true },
-    gender: String,
+    is_mobile_verified: { type: Boolean, default: false },
+    is_email_verified: { type: Boolean, default: false },
+    email: { type: String, unique: true },
+    password: { type: String },
+    gender: { type: String, enum: ['Male', 'Female', 'Other'] },
     points: { type: Number, default: 0 },
     firebase_token: String,
-    account_source: { type: String, enum: ['mobile', 'truecaller'] },
+    account_source: { type: String, enum: ['Mobile', 'Truecaller'], default: 'Mobile' },
     profile_image: String,
     role: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role', require: true }]
 });

@@ -39,6 +39,7 @@ exports.get_all = (req, res) => {
 
 exports.add = (req, res) => {
     const tournament = new Tournament({
+        id: new mongoose.Types.ObjectId(),
         tournament_name: req.body.tournament_name,
         logo: req.body.logo,
         description: req.body.description,
@@ -67,21 +68,9 @@ exports.add = (req, res) => {
 }
 
 exports.edit = (req, res) => {
-
-}
-
-exports.set_registration = (req, res) => {
     Tournament
         .update({ _id: req.params.id }, {
-            $set: {
-                registration: {
-                    registration_opening: req.body.registration_opening,
-                    registration_closing: req.body.registration_closing,
-                    form_message: req.body.form_message,
-                    validation_message: req.body.validation_message,
-                    tnc_link: req.body.tnc_link
-                }
-            }
+            $set: req.body
         })
         .exec()
         .then(() => {
@@ -96,5 +85,3 @@ exports.set_registration = (req, res) => {
             });
         })
 }
-
-exports.

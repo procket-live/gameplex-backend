@@ -19,6 +19,7 @@
     "body-parser": "^1.19.0",
     "crypto": "^1.0.1",
     "express": "4.17.0",
+    "express-session": "^1.17.0",
     "fastify": "2.4.1",
     "fcm-node": "^1.5.2",
     "firebase-admin": "^8.1.0",

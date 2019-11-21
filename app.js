@@ -9,6 +9,18 @@ const AdminBroExpressjs = require('admin-bro-expressjs')
 const userRoutes = require('./api/routes/user.route');
 const lookupTypeRoutes = require('./api/routes/lookup-type.route');
 const gameRoutes = require('./api/routes/game.route');
+const tournamentRoutes = require('./api/routes/tournament.route');
+
+const userModel = require('./api/models/user.model');
+const gameModel = require('./api/models/game.model');
+const lookupModel = require('./api/models/lookup-type.model');
+const participentModel = require('./api/models/participents.model');
+const tournamentModel = require('./api/models/tournament.model');
+const roleModel = require('./api/models/role.model');
+const otpModel = require('./api/models/otp.model');
+const kycModel = require('./api/models/kyc.model');
+const platformModel = require('./api/models/platform.model');
+const bankAccountModel = require('./api/models/bank-account.model');
 
 const app = express();
 AdminBro.registerAdapter(require('admin-bro-mongoose'))
@@ -18,6 +30,39 @@ const yo = mongoose.connect(
         useNewUrlParser: true
     }
 ).then((db) => {
+})
+
+const adminBro = new AdminBro({
+    resources: [
+        userModel,
+        gameModel,
+        lookupModel,
+        participentModel,
+        tournamentModel,
+        roleModel,
+        otpModel,
+        kycModel,
+        platformModel,
+        bankAccountModel
+    ],
+    rootPath: '/admin',
+    branding: {
+        companyName: 'Gameplex',
+    }
+})
+
+const adminBroRouter = AdminBroExpressjs.buildAuthenticatedRouter(adminBro, {
+    authenticate: async (email, password) => {
+        const user = await userModel.findOne({ email })
+        if (user) {
+            const matched = password == user.password;
+            if (matched) {
+                return user
+            }
+        }
+        return false
+    },
+    cookiePassword: 'some-secret-password-used-to-secure-cookie',
 })
 
 mongoose.Promise = global.Promise;
@@ -37,9 +82,14 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(adminBro.options.rootPath, adminBroRouter)
+
 app.use('/user', userRoutes);
 app.use('/lookup', lookupTypeRoutes);
-app.use('/game', gameRoutes);
+app.use('/games', gameRoutes);
+app.use('/tournament', tournamentRoutes);
+
+
 
 app.use((req, res, next) => {
     const error = new Error("Not found");
