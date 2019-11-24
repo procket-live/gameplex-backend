@@ -1,17 +1,31 @@
-const https = require('https');
-const authKey = '235391AG8E7NoOgG5b8d4843';
+const axios = require('axios');
+const querystring = require('querystring');
+const authKey = '235391Ae7cMna4J5da79840';
 
 function sendSMS(mobile, template) {
-    https.get(encodeURI(`https://api.msg91.com/api/sendhttp.php?mobiles=91${mobile}&authkey=${authKey}&route=4&sender=PROCKT&message=${template}&country=91`), (resp) => {
-        let data = '';
+    const params = {
+        mobiles: `91${mobile}`,
+        authkey: authKey,
+        route: 4,
+        sender: 'RKSVDL',
+        message: encodeURIComponent(template),
+        country: 91,
+    };
 
-        resp.on('data', (chunk) => {
-            data += chunk;
-            console.log('data', data)
-        });
-    }).on("error", (err) => {
-        console.log("Error: " + err.message);
-    });
+    const query = querystring.stringify(params);
+
+    const options = {
+        url: `https://api.msg91.com/api/sendhttp.php?${query}`,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'GET'
+    };
+
+    axios(options).then((res) => {
+        console.log('rrreesss', res);
+    })
 }
 
 module.exports = sendSMS;
+
