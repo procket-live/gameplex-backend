@@ -7,6 +7,7 @@ const otpSchema = mongoose.Schema({
     otp_type: { type: String, enum: ['email', 'mobile'], require: true },
     created_at: Date,
     expires_at: Date,
+    deleted_at: Date
 });
 
 module.exports = mongoose.model('Otp', otpSchema);
