@@ -10,6 +10,7 @@ const userSchema = mongoose.Schema({
     },
     is_mobile_verified: { type: Boolean, default: false },
     is_email_verified: { type: Boolean, default: false },
+    dob: { type: Date },
     email: { type: String, unique: true },
     password: { type: String },
     gender: { type: String, enum: ['Male', 'Female', 'Other'] },
