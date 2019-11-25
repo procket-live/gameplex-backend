@@ -39,11 +39,10 @@ exports.get_all = (req, res) => {
 
 exports.add = (req, res) => {
     const tournament = new Tournament({
-        id: new mongoose.Types.ObjectId(),
+        _id: new mongoose.Types.ObjectId(),
         tournament_name: req.body.tournament_name,
         description: req.body.description,
         game: req.body.game,
-        platform: req.body.platform,
         size: req.body.platform,
         created_at: new Date(),
         updated_at: new Date(),
