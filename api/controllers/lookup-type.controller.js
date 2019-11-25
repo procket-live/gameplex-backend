@@ -57,7 +57,7 @@ exports.add_value = (req, res) => {
         })
         .catch((err) => {
             res.status(201).json({
-                success: true,
+                success: false,
                 response: err
             })
         })
@@ -75,7 +75,7 @@ exports.get = (req, res) => {
         })
         .catch((err) => {
             res.status(201).json({
-                success: true,
+                success: false,
                 response: err
             })
         })
@@ -93,7 +93,7 @@ exports.get_single = (req, res) => {
         })
         .catch((err) => {
             res.status(201).json({
-                success: true,
+                success: false,
                 response: err
             })
         })

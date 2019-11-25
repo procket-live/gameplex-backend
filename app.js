@@ -10,6 +10,7 @@ const userRoutes = require('./api/routes/user.route');
 const lookupTypeRoutes = require('./api/routes/lookup-type.route');
 const gameRoutes = require('./api/routes/game.route');
 const tournamentRoutes = require('./api/routes/tournament.route');
+const dashboardRoutes = require('./api/routes/dashboard.route');
 
 const userModel = require('./api/models/user.model');
 const gameModel = require('./api/models/game.model');
@@ -100,8 +101,7 @@ app.use('/user', userRoutes);
 app.use('/lookup', lookupTypeRoutes);
 app.use('/games', gameRoutes);
 app.use('/tournament', tournamentRoutes);
-
-
+app.use('/dashboard', dashboardRoutes);
 
 app.use((req, res, next) => {
     const error = new Error("Not found");

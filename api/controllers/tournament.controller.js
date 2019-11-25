@@ -41,7 +41,6 @@ exports.add = (req, res) => {
     const tournament = new Tournament({
         id: new mongoose.Types.ObjectId(),
         tournament_name: req.body.tournament_name,
-        logo: req.body.logo,
         description: req.body.description,
         game: req.body.game,
         platform: req.body.platform,
