@@ -13,7 +13,7 @@ const gameSchema = mongoose.Schema({
         lookup_type: { type: mongoose.Schema.Types.ObjectId, ref: 'LookupType' },
         required: { type: Boolean, default: true }
     }],
-    price_meta: [{ key: String, dataType: String }],
+    price_meta: [{ key: String, dataType: String, ref: String }],
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
     created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }

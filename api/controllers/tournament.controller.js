@@ -5,6 +5,19 @@ const Tournament = require('../models/tournament.model');
 exports.get = (req, res) => {
     Tournament
         .findOne({ _id: req.params.id })
+        .populate('game')
+        .populate({
+            path: 'game',
+            populate: {
+                path: 'platform'
+            }
+        })
+        .populate({
+            path: 'game',
+            populate: {
+                path: 'game_meta.lookup_type',
+            }
+        })
         .exec()
         .then((result) => {
             res.status(201).json({
@@ -23,8 +36,11 @@ exports.get = (req, res) => {
 exports.get_all = (req, res) => {
     Tournament
         .find(req.query)
-        .exec((results) => {
-            res.status(201).json({
+        .populate('game')
+        .populate('game.platform')
+        .exec()
+        .then((results) => {
+            return res.status(201).json({
                 success: true,
                 response: results,
             })
@@ -72,9 +88,34 @@ exports.edit = (req, res) => {
         })
         .exec()
         .then(() => {
-            res.status(201).json({
-                success: true,
-            })
+            Tournament
+                .findById(req.params.id)
+                .populate('game')
+                .populate({
+                    path: 'game',
+                    populate: {
+                        path: 'platform'
+                    }
+                })
+                .populate({
+                    path: 'game',
+                    populate: {
+                        path: 'game_meta.lookup_type',
+                    }
+                })
+                .exec()
+                .then((tournament) => {
+                    res.status(201).json({
+                        success: true,
+                        response: tournament
+                    })
+                })
+                .catch((err) => {
+                    return res.status(200).json({
+                        success: false,
+                        response: err
+                    });
+                })
         })
         .catch((err) => {
             return res.status(200).json({
