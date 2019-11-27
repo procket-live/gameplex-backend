@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 
 const tournamentSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    active: { type: Boolean, default: false },
-    public: { type: Boolean, default: false },
     status: { type: String, enum: ['draft', 'active', 'completed'], default: 'draft' },
     tournament_name: String,
     logo: String,
@@ -16,6 +14,7 @@ const tournamentSchema = mongoose.Schema({
     size: Number,
     registration_opening: Date,
     registration_closing: Date,
+    tournament_start_time: Date,
     form_message: String,
     validation_message: String,
     tnc_link: String,

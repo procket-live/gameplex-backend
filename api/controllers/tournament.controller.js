@@ -59,7 +59,7 @@ exports.add = (req, res) => {
         tournament_name: req.body.tournament_name,
         description: req.body.description,
         game: req.body.game,
-        size: req.body.platform,
+        size: req.body.size,
         created_at: new Date(),
         updated_at: new Date(),
         created_by: req.userId
