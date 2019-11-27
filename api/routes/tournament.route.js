@@ -4,9 +4,9 @@ const router = express.Router();
 const TournamentController = require('../controllers/tournament.controller');
 const checkAuth = require('../middlewares/check-auth');
 
-router.get('/', TournamentController.get_all);
-router.get('/:id', TournamentController.get);
-router.post('/', TournamentController.add);
-router.put('/:id', TournamentController.edit);
+router.get('/', checkAuth, TournamentController.get_all);
+router.get('/:id', checkAuth, TournamentController.get);
+router.post('/', checkAuth, TournamentController.add);
+router.put('/:id', checkAuth, TournamentController.edit);
 
 module.exports = router;

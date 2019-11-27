@@ -34,6 +34,11 @@ exports.get = (req, res) => {
 }
 
 exports.get_all = (req, res) => {
+    const userId = req.userData.userId;
+    const query = req.query;
+    query['created_by'] = userId;
+    query['deleted_at'] = null;
+
     Tournament
         .find(req.query)
         .populate('game')
@@ -54,6 +59,8 @@ exports.get_all = (req, res) => {
 }
 
 exports.add = (req, res) => {
+    const userId = req.userData.userId;
+
     const tournament = new Tournament({
         _id: new mongoose.Types.ObjectId(),
         tournament_name: req.body.tournament_name,
@@ -62,7 +69,7 @@ exports.add = (req, res) => {
         size: req.body.size,
         created_at: new Date(),
         updated_at: new Date(),
-        created_by: req.userId
+        created_by: userId
     });
 
     tournament
@@ -82,8 +89,10 @@ exports.add = (req, res) => {
 }
 
 exports.edit = (req, res) => {
+    const userId = req.userData.userId;
+
     Tournament
-        .update({ _id: req.params.id }, {
+        .update({ _id: req.params.id, created_by: userId }, {
             $set: req.body
         })
         .exec()

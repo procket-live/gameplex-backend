@@ -20,7 +20,8 @@ const tournamentSchema = mongoose.Schema({
     tnc_link: String,
     created_at: Date,
     updated_at: Date,
-    created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    deleted_at: { type: Date, default: null }
 });
 
 module.exports = mongoose.model('Tournament', tournamentSchema);
