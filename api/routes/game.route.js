@@ -4,7 +4,7 @@ const router = express.Router();
 const GameController = require('../controllers/game.controller');
 const checkAuth = require('../middlewares/check-auth');
 
-router.get('/', checkAuth, GameController.get_all);
+router.get('/', GameController.get_all);
 router.get('/:id', checkAuth, GameController.get);
 router.post('/', checkAuth, GameController.add);
 router.put('/:id', checkAuth, GameController.edit)

@@ -99,7 +99,7 @@ app.use(adminBro.options.rootPath, adminBroRouter)
 
 app.use('/user', userRoutes);
 app.use('/lookup', lookupTypeRoutes);
-app.use('/games', gameRoutes);
+app.use('/game', gameRoutes);
 app.use('/tournament', tournamentRoutes);
 app.use('/dashboard', dashboardRoutes);
 

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const gameSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    active: Boolean,
+    active: { type: Boolean, default: true },
     name: String,
     description: String,
     thumbnail: String,

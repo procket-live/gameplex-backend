@@ -11,6 +11,7 @@ const sendNotification = require('../../utils/notifications');
 
 exports.get_user = (req, res, next) => {
     User.find({ _id: req.userData.userId })
+        .populate('role')
         .exec()
         .then((users) => {
             if (users.length == 0) {
@@ -217,6 +218,7 @@ exports.verify_otp = (req, res) => {
                 console.log('last record', lastRecord);
 
                 User.findOne({ _id: userId })
+                    .populate('role')
                     .exec()
                     .then((user) => {
                         const token = jwt.sign(
@@ -302,6 +304,7 @@ exports.verify_email_otp = (req, res) => {
                             .exec()
                             .then(() => {
                                 User.findById(userId)
+                                    .populate('role')
                                     .exec()
                                     .then((newUser) => {
                                         return res.status(200).json({
@@ -361,6 +364,7 @@ exports.update_user = (req, res, next) => {
         .exec()
         .then(() => {
             User.find({ _id: userId })
+                .populate('role')
                 .exec()
                 .then((users) => {
                     console.log('usersusersusers', users, userId)
