@@ -58,6 +58,29 @@ exports.get_all = (req, res) => {
         })
 }
 
+exports.get_upcoming = (req, res) => {
+    Tournament
+        .find({
+            status: 'active',
+            deleted_at: null
+        })
+        .populate('game')
+        .populate('game.platform')
+        .exec()
+        .then((results) => {
+            return res.status(201).json({
+                success: true,
+                response: results,
+            })
+        })
+        .catch((err) => {
+            return res.status(200).json({
+                success: false,
+                response: err
+            });
+        })
+}
+
 exports.add = (req, res) => {
     const userId = req.userData.userId;
 

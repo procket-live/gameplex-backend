@@ -17,6 +17,7 @@ const tournamentSchema = mongoose.Schema({
     tournament_start_time: Date,
     form_message: String,
     validation_message: String,
+    participents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Participent', require: true }],
     tnc_link: String,
     created_at: Date,
     updated_at: Date,
