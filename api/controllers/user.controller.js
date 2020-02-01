@@ -33,6 +33,20 @@ exports.get_user = (req, res, next) => {
         })
 };
 
+exports.attach_user = async (req, res, next) => {
+    const userId = req.userData.userId;
+    try {
+        const user = await User.findById(userId).exec();
+        req.user = user;
+        next();
+    } catch (err) {
+        return res.status(201).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
 exports.create_user_if_not_exist = (req, res, next) => {
     let mobile = req.body.mobile;
     const profile = req.body.profile;
@@ -45,6 +59,7 @@ exports.create_user_if_not_exist = (req, res, next) => {
         .exec()
         .then((users) => {
             if (users.length == 0) {
+
                 const user = new User({
                     _id: new mongoose.Types.ObjectId(),
                     mobile
@@ -146,7 +161,6 @@ exports.resend_otp = (req, res) => {
 
 exports.generate_email_otp = (req, res) => {
     const userId = req.userData.userId;
-    console.log('userId', userId)
     User.findOne({ _id: userId })
         .exec()
         .then((user) => {
@@ -215,7 +229,6 @@ exports.verify_otp = (req, res) => {
             const lastRecord = results[lastIndex];
             if (lastRecord.otp == otp) {
                 const userId = lastRecord.user;
-                console.log('last record', lastRecord);
 
                 User.findOne({ _id: userId })
                     .populate('role')
@@ -258,10 +271,10 @@ exports.verify_otp = (req, res) => {
                                 })
                             })
                     })
-                    .catch(() => {
+                    .catch((err) => {
                         return res.status(200).json({
                             success: false,
-                            response: 'unable to find user'
+                            response: err
                         })
                     })
 
@@ -353,12 +366,9 @@ exports.update_user = (req, res, next) => {
     const body = req.body;
 
     const updateParams = {};
-
     Object.keys(body).forEach((key) => {
         updateParams[key] = body[key];
     })
-
-    console.log('updateParams', updateParams);
 
     User.update({ _id: userId }, { $set: updateParams })
         .exec()
@@ -367,7 +377,6 @@ exports.update_user = (req, res, next) => {
                 .populate('role')
                 .exec()
                 .then((users) => {
-                    console.log('usersusersusers', users, userId)
                     res.status(201).json({
                         success: true,
                         response: users[0]
@@ -386,4 +395,113 @@ exports.update_user = (req, res, next) => {
                 response: err
             })
         })
+}
+
+exports.update_wallet_balance = async (req, res, next) => {
+    try {
+        const order_id = req.order_id;
+        const userId = req.userData.userId;
+        const amount = req.amount;
+        const source = req.source;
+
+        const walletTransactions = {
+            amount: amount,
+            target: "cash_balance",
+            source: source
+        };
+
+        if (order_id) {
+            walletTransactions.order = order_id;
+        }
+
+        await User.findByIdAndUpdate({ _id: userId }, {
+            $inc: {
+                wallet_cash_balance: amount
+            },
+            $push: {
+                wallet_transactions: walletTransactions
+            }
+        }).exec();
+
+        if (req.onSuccessNext) {
+            next();
+            return;
+        }
+
+        const user = await User
+            .findById(userId)
+            .populate('role')
+            .exec()
+
+        return res.status(200).json({
+            success: true,
+            response: user
+        })
+    } catch (err) {
+        return res.status(200).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
+exports.add_game_id = async (req, res) => {
+    const game = req.params.id;
+    const userId = req.userData.userId;
+    const gameUserId = req.body.user_id;
+
+    try {
+        await User.findByIdAndUpdate(userId, { $push: { game_ids: { game, user_id: gameUserId } } }).exec();
+        const user = await User.findById(userId).exec();
+
+        return res.status(200).json({
+            success: true,
+            response: user
+        })
+    } catch (err) {
+        res.status(200).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
+exports.get_wallet_balance = async () => {
+    const userId = req.userData.userId;
+
+    try {
+        const user = await User.findById(userId).exec();
+
+        return res.status(200).json({
+            success: true,
+            response: {
+                wallet_cash_balance: user.wallet_cash_balance,
+                wallet_bonous_balance: user.wallet_bonous_balance
+            }
+        });
+    } catch (err) {
+        res.status(200).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
+exports.wallet_transactions = async (req, res) => {
+    const userId = req.userData.userId;
+
+    try {
+        const user = await User.findById(userId).select('-_id wallet_transactions').populate('wallet_transactions.source', 'tournament_name');
+        const transactions = user.wallet_transactions;
+
+        return res.status(200).json({
+            success: true,
+            response: transactions
+        });
+    } catch (err) {
+        res.status(200).json({
+            success: false,
+            response: err
+        })
+    }
 }

@@ -10,18 +10,19 @@ const userRoutes = require('./api/routes/user.route');
 const lookupTypeRoutes = require('./api/routes/lookup-type.route');
 const gameRoutes = require('./api/routes/game.route');
 const tournamentRoutes = require('./api/routes/tournament.route');
-const dashboardRoutes = require('./api/routes/dashboard.route');
+const paymentRoutes = require('./api/routes/payment.route');
+const organizerRoutes = require('./api/routes/organizer.route');
 
 const userModel = require('./api/models/user.model');
 const gameModel = require('./api/models/game.model');
 const lookupModel = require('./api/models/lookup-type.model');
-const participentModel = require('./api/models/participents.model');
 const tournamentModel = require('./api/models/tournament.model');
 const roleModel = require('./api/models/role.model');
 const otpModel = require('./api/models/otp.model');
 const kycModel = require('./api/models/kyc.model');
 const platformModel = require('./api/models/platform.model');
 const bankAccountModel = require('./api/models/bank-account.model');
+const wallet = require('./api/models/wallet.model');
 
 const app = express();
 AdminBro.registerAdapter(require('admin-bro-mongoose'))
@@ -38,13 +39,13 @@ const adminBro = new AdminBro({
         userModel,
         gameModel,
         lookupModel,
-        participentModel,
         tournamentModel,
         roleModel,
         otpModel,
         kycModel,
         platformModel,
-        bankAccountModel
+        bankAccountModel,
+        wallet
     ],
     rootPath: '/admin',
     branding: {
@@ -101,7 +102,8 @@ app.use('/user', userRoutes);
 app.use('/lookup', lookupTypeRoutes);
 app.use('/game', gameRoutes);
 app.use('/tournament', tournamentRoutes);
-app.use('/dashboard', dashboardRoutes);
+app.use('/payment', paymentRoutes);
+app.use('/organizer', organizerRoutes);
 
 app.use((req, res, next) => {
     const error = new Error("Not found");

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node web.js",
-    "server": "JWT_SECRET=232323 SMTP_EMAIL=admin@procket.live SMTP_PASS=Hkxicor12345 nodemon web.js"
+    "server": "MERCHANT_ID=gzGeYn36130961827220 MERCHANT_KEY=an3MLErs4_k0zT7m JWT_SECRET=232323 SMTP_EMAIL=admin@procket.live SMTP_PASS=Hkxicor12345 nodemon web.js"
   },
   "author": "",
   "license": "ISC",
@@ -32,6 +32,7 @@
     "nodemailer": "^6.3.1",
     "nodemon": "^1.19.2",
     "querystring": "^0.2.0",
+    "uniqid": "^5.2.0",
     "util": "^0.12.0"
   }
 }

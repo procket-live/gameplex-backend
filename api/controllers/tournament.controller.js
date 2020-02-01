@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
 const Tournament = require('../models/tournament.model');
+const Participent = require('../models/participent.model');
+const Order = require('../models/order.model');
+const TournamentUtils = require('../../utils/tournament.utils');
 
 exports.get = (req, res) => {
     Tournament
@@ -59,15 +62,68 @@ exports.get_all = (req, res) => {
 }
 
 exports.get_upcoming = (req, res) => {
+    const filter = {
+        status: 'active',
+        deleted_at: null,
+        tournament_start_time: { $gt: Date.now() }
+    };
+
+    if (req.params.id) { //userId
+        filter['participents'] = { $contains: req.params.id }
+    }
+
     Tournament
-        .find({
-            status: 'active',
-            deleted_at: null
-        })
+        .find(filter)
         .populate('game')
         .populate('game.platform')
+        .populate('organizer')
+        .populate({
+            path: 'participents',
+            populate: {
+                path: 'user',
+                select: 'name profile_image'
+            }
+        })
         .exec()
         .then((results) => {
+            return res.status(201).json({
+                success: true,
+                response: results,
+            })
+        })
+        .catch((err) => {
+            return res.status(200).json({
+                success: false,
+                response: err
+            });
+        })
+}
+
+exports.get_upcoming_active = (req, res) => {
+    const userId = req.userData.userId;
+
+    const filter = {
+        deleted_at: null,
+        tournament_start_time: { $gt: Date.now() },
+        'participents.user._id': userId
+    };
+    console.log('filter', filter)
+
+    Tournament
+        .find(filter)
+        .populate('game')
+        .populate('game.platform')
+        .populate('organizer')
+        .populate({
+            path: 'participents',
+            populate: {
+                path: 'user',
+                select: 'name profile_image'
+            }
+        })
+        .exec()
+        .then((results) => {
+            console.log('results', results)
             return res.status(201).json({
                 success: true,
                 response: results,
@@ -88,6 +144,7 @@ exports.add = (req, res) => {
         _id: new mongoose.Types.ObjectId(),
         tournament_name: req.body.tournament_name,
         description: req.body.description,
+        organizer: req.body.organizer_id,
         game: req.body.game,
         size: req.body.size,
         created_at: new Date(),
@@ -155,4 +212,117 @@ exports.edit = (req, res) => {
                 response: err
             });
         })
+}
+
+exports.join_tournament = async (req, res, next) => {
+    const userId = req.userData.userId;
+    const tournamentId = req.params.id;
+    const order_id = req.body.order_id;
+
+    try {
+        const order = await Order.findOne({ order_id: order_id }).exec();
+        const participentId = new mongoose.Types.ObjectId();
+        const participent = new Participent({
+            _id: participentId,
+            user: userId,
+            tournament: tournamentId,
+            order: order._id
+        });
+
+        if (order.status !== "success") {
+            return res.status(200).json({
+                success: false,
+                response: 'Please complete payment first.'
+            });
+        }
+
+        await participent.save();
+        await Tournament.update({ _id: tournamentId }, { $push: { participents: participentId } }).exec();
+        return res.status(200).json({
+            success: true,
+        });
+    } catch (err) {
+        return res.status(200).json({
+            success: false,
+            response: err
+        });
+    }
+}
+
+exports.is_alredy_joined = async (req, res, next) => {
+    const userId = req.userData.userId;
+    const tournamentId = req.params.id;
+    const order_id = req.body.order_id;
+
+    const order = await Order.findOne({ order_id: order_id }).exec();
+    const participents = await Participent.find({ tournament: tournamentId, user: userId, order: order._id }).exec();
+
+    if (participents.length !== 0) {
+        return res.status(200).json({
+            success: false,
+            response: 'Already joined'
+        });
+    }
+
+    next();
+}
+
+exports.finish_joining = async (req, res) => {
+    const userId = req.userData.userId;
+    const tournament = req.tournament;
+    const id = tournament._id;
+
+    try {
+        const result = await Tournament.findByIdAndUpdate(id, {
+            $push: {
+                participents: {
+                    user: userId,
+                    collection_amount: req.amount
+                }
+            }
+        })
+        return res.status(200).json({
+            success: true,
+            response: 'Joined'
+        });
+    } catch (err) {
+        return res.status(200).json({
+            success: false,
+            response: err
+        });
+    }
+}
+
+exports.get_participents = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        const tournament = await Tournament
+            .findById(id)
+            .populate({
+                path: 'participents',
+                populate: {
+                    path: 'user',
+                    select: 'name profile_image'
+                }
+            })
+            .populate({
+                path: 'participents',
+                populate: {
+                    path: 'order'
+                }
+            })
+            .exec();
+        const participents = tournament.participents;
+
+        return res.status(200).json({
+            success: true,
+            response: participents
+        });
+    } catch (err) {
+        return res.status(200).json({
+            success: false,
+            response: err
+        });
+    }
 }

@@ -18,7 +18,18 @@ const userSchema = mongoose.Schema({
     firebase_token: String,
     account_source: { type: String, enum: ['Mobile', 'Truecaller'], default: 'Mobile' },
     profile_image: String,
-    role: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role', require: true }]
+    role: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role', require: true }],
+    wallet_cash_balance: { type: Number, default: 0 },
+    wallet_bonous_balance: { type: Number, default: 0 },
+    wallet_transactions: [{
+        amount: { type: Number },
+        target: { type: String, enum: ['cash_balance', 'bonous_balance'], require: true },
+        created_at: { type: Date, default: Date.now },
+        order: { type: String },
+        source: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament' },
+        deleted_at: { type: Date, default: null }
+    }],
+    game_ids: [{ game: mongoose.Schema.Types.ObjectId, user_id: String }]
 });
 
 module.exports = mongoose.model('User', userSchema);
