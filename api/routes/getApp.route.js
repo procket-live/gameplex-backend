@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', LookupTypeController.get);
+const getAppController = require('../controllers/getApp.controller');
+
+router.get('/', getAppController.get_app);
 
 module.exports = router;
