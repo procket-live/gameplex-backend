@@ -7,7 +7,7 @@ function sendSMS(mobile, template) {
         mobiles: `91${mobile}`,
         authkey: authKey,
         route: 4,
-        sender: 'RKSVDL',
+        sender: 'GAMEPX',
         message: encodeURIComponent(template),
         country: 91,
     };
