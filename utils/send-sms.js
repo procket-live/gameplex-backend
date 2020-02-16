@@ -22,9 +22,7 @@ function sendSMS(mobile, template) {
         method: 'GET'
     };
 
-    axios(options).then((res) => {
-        console.log('rrreesss', res);
-    })
+    return axios(options);
 }
 
 module.exports = sendSMS;
