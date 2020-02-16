@@ -12,6 +12,7 @@ const gameRoutes = require('./api/routes/game.route');
 const tournamentRoutes = require('./api/routes/tournament.route');
 const paymentRoutes = require('./api/routes/payment.route');
 const organizerRoutes = require('./api/routes/organizer.route');
+const getAppRoutes = require('./api/routes/getApp.route');
 
 const userModel = require('./api/models/user.model');
 const gameModel = require('./api/models/game.model');
@@ -104,6 +105,7 @@ app.use('/game', gameRoutes);
 app.use('/tournament', tournamentRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/organizer', organizerRoutes);
+app.use('/getApp', getAppRoutes);
 
 app.use((req, res, next) => {
     const error = new Error("Not found");
