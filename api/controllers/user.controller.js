@@ -274,7 +274,7 @@ exports.verify_otp = (req, res) => {
                     .catch((err) => {
                         return res.status(200).json({
                             success: false,
-                            response: err
+                            response: err + "gand mra li"
                         })
                     })
 

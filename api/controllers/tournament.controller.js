@@ -273,7 +273,7 @@ exports.finish_joining = async (req, res) => {
     const id = tournament._id;
 
     try {
-        const result = await Tournament.findByIdAndUpdate(id, {
+        await Tournament.findByIdAndUpdate(id, {
             $push: {
                 participents: {
                     user: userId,
@@ -318,6 +318,51 @@ exports.get_participents = async (req, res) => {
         return res.status(200).json({
             success: true,
             response: participents
+        });
+    } catch (err) {
+        return res.status(200).json({
+            success: false,
+            response: err
+        });
+    }
+}
+
+exports.set_ranking = async (req, res) => {
+    const id = req.params.id;
+    const record = req.body.record || [];
+
+    try {
+        record.forEach(async (item) => {
+            await Participent.findByIdAndUpdate(item.participentId, {
+                $set: {
+                    result_meta: item.result_meta
+                }
+            }).exec().then((result) => {
+                console.log('resultTTT', result);
+            });
+        })
+
+        await Tournament.findByIdAndUpdate(id, { $set: { ranking_set: true } }).exec();
+        const result = await Tournament
+            .findById(id)
+            .populate('game')
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'platform'
+                }
+            })
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'game_meta.lookup_type',
+                }
+            })
+            .exec();
+
+        return res.status(200).json({
+            success: true,
+            response: result
         });
     } catch (err) {
         return res.status(200).json({

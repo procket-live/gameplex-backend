@@ -14,5 +14,6 @@ router.post('/', checkAuth, TournamentController.add);
 router.put('/:id', checkAuth, TournamentController.edit);
 router.post('/join/:id', checkAuth, TournamentController.is_alredy_joined, TournamentController.join_tournament);
 router.get('/:id/participents', checkAuth, TournamentController.get_participents);
+router.post('/ranking/:id', checkAuth, TournamentController.set_ranking);
 
 module.exports = router;

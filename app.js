@@ -13,6 +13,7 @@ const tournamentRoutes = require('./api/routes/tournament.route');
 const paymentRoutes = require('./api/routes/payment.route');
 const organizerRoutes = require('./api/routes/organizer.route');
 const getAppRoutes = require('./api/routes/getApp.route');
+const notificationRoutes = require('./api/routes/notification.route');
 
 const userModel = require('./api/models/user.model');
 const gameModel = require('./api/models/game.model');
@@ -24,6 +25,8 @@ const kycModel = require('./api/models/kyc.model');
 const platformModel = require('./api/models/platform.model');
 const bankAccountModel = require('./api/models/bank-account.model');
 const wallet = require('./api/models/wallet.model');
+const participentModel = require('./api/models/participent.model');
+const orderModel = require('./api/models/order.model');
 
 const app = express();
 AdminBro.registerAdapter(require('admin-bro-mongoose'))
@@ -46,7 +49,9 @@ const adminBro = new AdminBro({
         kycModel,
         platformModel,
         bankAccountModel,
-        wallet
+        wallet,
+        participentModel,
+        orderModel
     ],
     rootPath: '/admin',
     branding: {
@@ -106,6 +111,7 @@ app.use('/tournament', tournamentRoutes);
 app.use('/payment', paymentRoutes);
 app.use('/organizer', organizerRoutes);
 app.use('/getApp', getAppRoutes);
+app.use('/notification', notificationRoutes);
 
 app.use((req, res, next) => {
     const error = new Error("Not found");
