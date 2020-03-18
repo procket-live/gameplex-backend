@@ -371,3 +371,7 @@ exports.set_ranking = async (req, res) => {
         });
     }
 }
+
+exports.calculate = async (req, res) => {
+
+}
