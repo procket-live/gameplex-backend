@@ -375,3 +375,45 @@ exports.set_ranking = async (req, res) => {
 exports.calculate = async (req, res) => {
 
 }
+
+exports.get_my_tournaments = async (req, res) => {
+    const userId = req.userData.userId;
+
+    try {
+        const result = await Participent
+            .find({ user: userId }, '-_id tournament')
+            .populate(
+                {
+                    path: 'tournament',
+                    populate: {
+                        path: 'game',
+                        populate: 'platform'
+                    }
+                })
+            .exec();
+
+        const joined = [];
+        const completed = [];
+
+        result.forEach((item = {}) => {
+            if (item.tournament.status == "completed") {
+                completed.push(item.tournament);
+            } else {
+                joined.push(item.tournament);
+            }
+        })
+
+        return res.status(200).json({
+            success: true,
+            response: {
+                joined,
+                completed
+            }
+        });
+    } catch (err) {
+        return res.status(200).json({
+            success: false,
+            response: err
+        });
+    }
+}

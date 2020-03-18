@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const Notification = require('../models/game.model');
+const Notification = require('../models/notification.model');
 
 exports.get_all = async (req, res) => {
     try {
         const result = await Notification
-            .find({ _id: req.userData.userId })
+            .find({ user: req.userData.userId })
             .exec()
 
         res.status(201).json({

@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 
-const notificationScheme = mongoose.Schema({
+const offerSchema = mongoose.Schema({
     _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', require: true },
-    title: { type: String },
-    message: { type: String },
+    message: { type: mongoose.Schema.Types.String },
+    image: { type: mongoose.Schema.Types.String },
     created_by: { type: mongoose.Schema.ObjectId, ref: 'User' },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
+    expires_at: { type: Date },
+    active: { type: Boolean }
 });
 
-module.exports = mongoose.model('Notification', notificationScheme);
+module.exports = mongoose.model('Offer', offerSchema);
