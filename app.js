@@ -31,6 +31,7 @@ const orderModel = require('./api/models/order.model');
 const offerModel = require('./api/models/offer.model');
 const organizerModel = require('./api/models/organizer.model');
 const notificationModel = require('./api/models/notification.model');
+const instructionModel = require('./api/models/instruction-step.model');
 
 const app = express();
 AdminBro.registerAdapter(require('admin-bro-mongoose'))
@@ -58,7 +59,8 @@ const adminBro = new AdminBro({
         orderModel,
         offerModel,
         organizerModel,
-        notificationModel
+        notificationModel,
+        instructionModel
     ],
     rootPath: '/admin',
     branding: {

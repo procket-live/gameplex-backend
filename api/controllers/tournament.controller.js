@@ -21,6 +21,17 @@ exports.get = (req, res) => {
                 path: 'game_meta.lookup_type',
             }
         })
+        .populate({
+            path: 'game',
+            populate: 'instructions'
+        })
+        .populate({
+            path: 'game',
+            populate: 'guide'
+        })
+        .populate({
+            path: ''
+        })
         .exec()
         .then((result) => {
             res.status(201).json({
@@ -45,7 +56,14 @@ exports.get_all = (req, res) => {
     Tournament
         .find(req.query)
         .populate('game')
-        .populate('game.platform')
+        .populate({
+            path: 'game',
+            populate: 'instructions'
+        })
+        .populate({
+            path: 'game',
+            populate: 'guide'
+        })
         .exec()
         .then((results) => {
             return res.status(201).json({
@@ -84,6 +102,18 @@ exports.get_upcoming = (req, res) => {
                 select: 'name profile_image'
             }
         })
+        .populate({
+            path: 'game',
+            populate: {
+                path: 'instructions'
+            }
+        })
+        .populate({
+            path: 'game',
+            populate: {
+                path: 'guide'
+            }
+        })
         .exec()
         .then((results) => {
             return res.status(201).json({
@@ -113,6 +143,14 @@ exports.get_upcoming_active = (req, res) => {
         .find(filter)
         .populate('game')
         .populate('game.platform')
+        .populate({
+            path: 'game',
+            populate: 'instructions'
+        })
+        .populate({
+            path: 'game',
+            populate: 'guide'
+        })
         .populate('organizer')
         .populate({
             path: 'participents',
@@ -229,7 +267,7 @@ exports.join_tournament = async (req, res, next) => {
             order: order._id
         });
 
-        if (order.status !== "success") {
+        if (order.status !== "success" && order.amount != 0) {
             return res.status(200).json({
                 success: false,
                 response: 'Please complete payment first.'
