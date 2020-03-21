@@ -119,7 +119,7 @@ exports.generate_otp = (req, res, next) => {
             otp
                 .save()
                 .then(() => {
-                    const template = `<#> Welcome to Gameplex. OTP is ${generatedOtp}`;
+                    const template = `<#> Welcome to Gameplex. OTP is ${generatedOtp} \n RqwxvkzBoqA`;
                     sendSMS(mobile, template);
                     res.status(201).json({
                         success: true,

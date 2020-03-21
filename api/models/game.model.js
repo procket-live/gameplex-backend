@@ -14,6 +14,8 @@ const gameSchema = mongoose.Schema({
         lookup_type: { type: mongoose.Schema.Types.ObjectId, ref: 'LookupType' },
         required: { type: Boolean, default: true }
     }],
+    packageId: String,
+    playstore: String,
     price_meta: [{ _id: { type: mongoose.Schema.Types.ObjectId, auto: true }, key: String, dataType: String, ref: String }],
     instructions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'InstructionStep' }],
     guide: [{ type: mongoose.Schema.Types.ObjectId, ref: 'InstructionStep' }],
