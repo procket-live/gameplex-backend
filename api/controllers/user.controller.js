@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const jwt = require('jsonwebtoken');
+const UsernameGenerator = require('username-generator');
+var generator = require('generate-password');
+const QB = require('../../utils/quickblox.utils');
 
 const User = require('../models/user.model');
 const OTP = require('../models/otp.model');
@@ -59,10 +62,17 @@ exports.create_user_if_not_exist = (req, res, next) => {
         .exec()
         .then((users) => {
             if (users.length == 0) {
+                const username = UsernameGenerator.generateUsername();
+                var quickblox_secret = generator.generate({
+                    length: 10,
+                    numbers: true
+                });
 
                 const user = new User({
                     _id: new mongoose.Types.ObjectId(),
-                    mobile
+                    mobile,
+                    username,
+                    quickblox_secret
                 });
 
                 user
@@ -74,6 +84,8 @@ exports.create_user_if_not_exist = (req, res, next) => {
                                 req.userId = newUser._id;
                                 req.profile = profile;
                                 req.mobile = mobile;
+                                req.username = username;
+                                req.quickblox_secret = quickblox_secret;
                                 next();
                             })
                     })
@@ -87,6 +99,7 @@ exports.create_user_if_not_exist = (req, res, next) => {
                 req.userId = users[0]._id;
                 req.profile = profile;
                 req.mobile = mobile;
+                req.skipQblox = true;
                 next();
             }
         })
@@ -505,4 +518,44 @@ exports.wallet_transactions = async (req, res) => {
             response: err
         })
     }
+}
+
+exports.create_qblox_account = (req, res, next) => {
+    if (req.skipQblox) {
+        next();
+    }
+
+    const userId = req.userId;
+    const username = req.username;
+    const password = req.quickblox_secret;
+
+    var params = {
+        login: username,
+        password: password
+    };
+
+    QB.init(({ qb, err }) => {
+        if (err) {
+            next();
+            return;
+        }
+
+        qb.users.create(params, async function (err, response) {
+            console.log('TOTOTOTOT', err, response);
+            if (err) {
+                next();
+                return;
+            }
+
+            await User.findByIdAndUpdate(
+                userId,
+                {
+                    $set: {
+                        quickblox_id: String(response.id)
+                    }
+                }).exec();
+
+            next();
+        });
+    });
 }

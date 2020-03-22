@@ -6,7 +6,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node web.js",
-        "server": "RAZORPAY_ID=rzp_test_VhrhI0BbetdOyJ RAZORPAY_SECRET=DeIWbfSU0PPCQcPb4W9KBPjD  MERCHANT_ID=gzGeYn36130961827220 MERCHANT_KEY=an3MLErs4_k0zT7m JWT_SECRET=232323 SMTP_EMAIL=admin@procket.live SMTP_PASS=Hkxicor12345 nodemon web.js"
+        "server": "QBLOX_APP_ID=80891 QBLOX_APP_KEY=dMHKttwQcAVJQGK QBLOX_APP_SECRET=SCdqjUjhky9x3YY  RAZORPAY_ID=rzp_test_VhrhI0BbetdOyJ RAZORPAY_SECRET=DeIWbfSU0PPCQcPb4W9KBPjD  MERCHANT_ID=gzGeYn36130961827220 MERCHANT_KEY=an3MLErs4_k0zT7m JWT_SECRET=232323 SMTP_EMAIL=admin@procket.live SMTP_PASS=Hkxicor12345 nodemon web.js"
     },
     "author": "",
     "license": "ISC",
@@ -24,6 +24,7 @@
         "fastify": "2.4.1",
         "fcm-node": "^1.5.2",
         "firebase-admin": "^8.1.0",
+        "generate-password": "^1.5.1",
         "http": "0.0.0",
         "https": "^1.0.0",
         "jsonwebtoken": "8.5.1",
@@ -33,8 +34,10 @@
         "nodemailer": "^6.3.1",
         "nodemon": "^1.19.2",
         "querystring": "^0.2.0",
+        "quickblox": "^2.12.7",
         "razorpay": "^2.0.6",
         "uniqid": "^5.2.0",
+        "username-generator": "^1.1.0",
         "util": "^0.12.0"
     }
 }
