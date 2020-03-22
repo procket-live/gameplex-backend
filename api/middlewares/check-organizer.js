@@ -5,7 +5,8 @@ module.exports = async (req, res, next) => {
     try {
         const userId = req.userData.userId;
         const user = await User.findById(userId).select('-_id role').populate('role').exec();
-        if (Role.hasRole(user, 'Organizer')) {
+        console.log('user', user)
+        if (Role.hasRole(user, 'Organizer') || Role.hasRole(user, "Admin")) {
             next();
         } else {
             return res.status(200).json({
