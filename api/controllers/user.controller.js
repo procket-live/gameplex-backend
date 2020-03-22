@@ -414,7 +414,7 @@ exports.update_wallet_balance = async (req, res, next) => {
             walletTransactions.order = order_id;
         }
 
-        await User.findByIdAndUpdate({ _id: userId }, {
+        await User.findByIdAndUpdate(userId, {
             $inc: {
                 wallet_cash_balance: amount
             },
@@ -429,9 +429,10 @@ exports.update_wallet_balance = async (req, res, next) => {
         }
 
         const user = await User
-            .findById(userId)
+            .findOne({ _id: userId })
             .populate('role')
-            .exec()
+            .exec();
+
 
         return res.status(200).json({
             success: true,

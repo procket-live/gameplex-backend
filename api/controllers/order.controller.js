@@ -144,8 +144,6 @@ exports.get_transactions = async (req, res) => {
     try {
         const orders = await Order
             .find({ created_by: userId })
-            .populate('target_ref')
-            .populate('source', 'tournament_name')
             .sort({ updated_at: 'desc' })
             .exec();
 

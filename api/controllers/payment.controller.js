@@ -1,76 +1,101 @@
-const { paytm_config } = require('../../paytm/paytm_config');
-const { genchecksum, verifychecksum } = require('../../paytm/checksum');
+const mongoose = require('mongoose');
 
-exports.generate_checksum = (req, res) => {
-    const user = req.user;
+const Razorpay = require('../../utils/razorpay.utils');
+const Order = require('../models/order.model');
 
-    const orderId = req.order_id;
-    const amount = req.amount;
+exports.generate_order = (req, res) => {
+    const userId = req.userData.userId;
+    const amount = req.body.amount;
 
-    const params = {
-        MID: paytm_config.MID,
-        ORDER_ID: String(orderId),
-        CUST_ID: String(user._id),
-        INDUSTRY_TYPE_ID: String(paytm_config.INDUSTRY_TYPE_ID),
-        CHANNEL_ID: String(paytm_config.CHANNEL_ID),
-        TXN_AMOUNT: String(amount),
-        WEBSITE: String(paytm_config.WEBSITE),
-        CALLBACK_URL: `${paytm_config.CALLBACK_URL}?ORDER_ID=${orderId}`,
-        MOBILE_NO: String(user.mobile),
-        EMAIL: String(user.email)
+    const instance = Razorpay.getRazorpayInstance();
+    console.log('instance', instance)
+    const _id = new mongoose.Types.ObjectId();
+
+    var options = {
+        amount: parseInt(amount) * 100,
+        currency: "INR",
+        receipt: String(_id),
+        payment_capture: '0'
     };
 
-    try {
-        genchecksum(params, paytm_config.MERCHANT_KEY, function (err, checksum) {
-            if (err) {
-                return res.status(200).json({
+    instance.orders.create(options, function (err, order) {
+        if (err) {
+            return res.status(201).json({
+                success: false,
+                response: err
+            });
+        }
+
+        new Order({
+            _id: _id,
+            order_id: order.id,
+            target_ref: userId,
+            target: "User",
+            user: userId,
+            amount: amount,
+            generate_response: order,
+            created_by: userId,
+        })
+            .save()
+            .then(() => {
+                return res.status(201).json({
+                    success: true,
+                    response: {
+                        order_id: order.id,
+                    }
+                });
+            })
+            .catch((err) => {
+                return res.status(201).json({
                     success: false,
                     response: err
-                })
-            }
-
-            return res.status(200).json({
-                success: true,
-                response: {
-                    order_id: orderId,
-                    checksum: checksum
-                },
+                });
             })
-        })
-    } catch (err) {
-    }
+    });
+
+
 }
 
-exports.validate_checksum = (req, res, next) => {
-    var paytmChecksum = "";
-    const paytmParams = {};
-    const received_data = req.body;
-    try {
-        if (received_data["status"] != "Success") {
-            req.status = "failed";
-            next();
-            return;
-        }
+exports.validate_payment = async (req, res, next) => {
+    const razorpay_payment_id = req.body.razorpay_payment_id;
+    const razorpay_order_id = req.body.razorpay_order_id;
+    const razorpay_signature = req.body.razorpay_signature;
+    const code = req.body.code;
 
-        for (var key in received_data) {
-            if (key == "CHECKSUMHASH") {
-                paytmChecksum = received_data[key];
-            } else {
-                paytmParams[key] = received_data[key];
+    if (code == 0) {
+        Order.findOneAndUpdate({ order_id: razorpay_order_id }, {
+            $set: {
+                status: "failed",
+                updated_at: Date.now()
             }
-        }
+        }).exec();
+        return;
+    }
 
-        var isValidChecksum = verifychecksum(paytmParams, paytm_config.MERCHANT_KEY, paytmChecksum);
-        isValidChecksum = true;
+    const generate_signature = Razorpay.generateSignature(razorpay_order_id, razorpay_payment_id);
 
-        if (isValidChecksum) {
-            req.status = "success";
-            req.order_id = received_data['ORDERID'] || received_data['ORDER_ID'];
-            req.amount = received_data['TXNAMOUNT'];
-            req.string_response = JSON.stringify(paytmParams);
-        } else {
-            req.status = "failed";
-        }
+    if (razorpay_signature != generate_signature) {
+        return res.status(201).json({
+            success: false,
+            response: "Wrong Signature"
+        });
+    }
+    try {
+        const order = await Order.findOne({ order_id: razorpay_order_id }).exec();
+        await Order.findOneAndUpdate({ _id: order._id }, {
+            $set: {
+                status: "success",
+                success_response: {
+                    razorpay_payment_id,
+                    razorpay_order_id,
+                    razorpay_signature
+                },
+                updated_at: Date.now()
+            }
+        }).exec();
+        req.amount = order.amount;
+        req.order_id = order.razorpay_order_id;
+        req.source = order._id;
         next();
     } catch (err) {
         return res.status(201).json({
