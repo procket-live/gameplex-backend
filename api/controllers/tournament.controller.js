@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Tournament = require('../models/tournament.model');
 const Participent = require('../models/participent.model');
-const Order = require('../models/order.model');
+const User = require('../models/user.model');
 const TournamentUtils = require('../../utils/tournament.utils');
 
 exports.get = (req, res) => {
@@ -255,27 +255,50 @@ exports.edit = (req, res) => {
 exports.join_tournament = async (req, res, next) => {
     const userId = req.userData.userId;
     const tournamentId = req.params.id;
-    const order_id = req.body.order_id;
 
     try {
-        const order = await Order.findOne({ order_id: order_id }).exec();
+
+        const tournament = await Tournament.findById(tournamentId).exec();
+        const user = await User.findById(userId).exec();
+        const entryFee = TournamentUtils.calculateEntryFee(tournament.prize || []);
+        const walletBalance = TournamentUtils.calculateWalletAmount(user);
+
+        if (entryFee > walletBalance) {
+            return res.status(200).json({
+                success: false,
+                response: 'Insufficient wallet balance'
+            });
+        }
+
+        const walletTransaction = {
+            amount: -entryFee,
+            target: "cash_balance",
+            source: tournamentId,
+            source_name: "Tournament"
+        };
+
+
+        await User.findByIdAndUpdate(userId, {
+            $inc: {
+                wallet_cash_balance: -entryFee
+            },
+            $push: {
+                wallet_transactions: walletTransaction
+            }
+        }).exec();
+
+
         const participentId = new mongoose.Types.ObjectId();
         const participent = new Participent({
             _id: participentId,
             user: userId,
             tournament: tournamentId,
-            order: order._id
+            wallet_transaction: walletTransaction
         });
-
-        if (order.status !== "success" && order.amount != 0) {
-            return res.status(200).json({
-                success: false,
-                response: 'Please complete payment first.'
-            });
-        }
 
         await participent.save();
         await Tournament.update({ _id: tournamentId }, { $push: { participents: participentId } }).exec();
+
         return res.status(200).json({
             success: true,
         });
@@ -290,10 +313,8 @@ exports.join_tournament = async (req, res, next) => {
 exports.is_alredy_joined = async (req, res, next) => {
     const userId = req.userData.userId;
     const tournamentId = req.params.id;
-    const order_id = req.body.order_id;
 
-    const order = await Order.findOne({ order_id: order_id }).exec();
-    const participents = await Participent.find({ tournament: tournamentId, user: userId, order: order._id }).exec();
+    const participents = await Participent.find({ tournament: tournamentId, user: userId }).exec();
 
     if (participents.length !== 0) {
         return res.status(200).json({

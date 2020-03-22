@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const participentSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', require: true },
-    order: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+    wallet_transaction: { type: mongoose.Schema.Types.Mixed },
     tournament: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament' },
     result_meta: { kills: String, rank: Number },
     created_at: { type: Date, default: Date.now },

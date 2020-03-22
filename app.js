@@ -80,9 +80,9 @@ const adminBroRouter = AdminBroExpressjs.buildAuthenticatedRouter(adminBro, {
                 }
             })
 
-            if (!isAdmin) {
-                return false;
-            }
+            // if (!isAdmin) {
+            //     return false;
+            // }
 
             const matched = password == user.password;
             if (matched) {
