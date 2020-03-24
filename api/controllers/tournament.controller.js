@@ -6,13 +6,26 @@ const User = require('../models/user.model');
 const TournamentUtils = require('../../utils/tournament.utils');
 
 exports.get = (req, res) => {
+    let tournamentId = req.params.id;
+
+    if (req.tournamentId) {
+        tournamentId = req.tournamentId;
+    }
+
     Tournament
-        .findOne({ _id: req.params.id })
+        .findOne({ _id: tournamentId })
         .populate('game')
         .populate({
             path: 'game',
             populate: {
                 path: 'platform'
+            }
+        })
+        .populate({
+            path: 'participents',
+            populate: {
+                path: 'user',
+                select: 'name profile_image'
             }
         })
         .populate({
@@ -254,7 +267,11 @@ exports.edit = (req, res) => {
 
 exports.join_tournament = async (req, res, next) => {
     const userId = req.userData.userId;
-    const tournamentId = req.params.id;
+    let tournamentId = req.params.id;
+
+    if (req.tournamentId) {
+        tournamentId = req.tournamentId;
+    }
 
     try {
 
@@ -299,6 +316,11 @@ exports.join_tournament = async (req, res, next) => {
         await participent.save();
         await Tournament.update({ _id: tournamentId }, { $push: { participents: participentId } }).exec();
 
+        if (req.skipResponse) {
+            next();
+            return;
+        }
+
         return res.status(200).json({
             success: true,
         });
@@ -312,7 +334,11 @@ exports.join_tournament = async (req, res, next) => {
 
 exports.is_alredy_joined = async (req, res, next) => {
     const userId = req.userData.userId;
-    const tournamentId = req.params.id;
+    let tournamentId = req.params.id;
+
+    if (req.tournamentId) {
+        tournamentId = tournamentId;
+    }
 
     const participents = await Participent.find({ tournament: tournamentId, user: userId }).exec();
 
