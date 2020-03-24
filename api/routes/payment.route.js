@@ -9,5 +9,6 @@ const PaymentController = require('../controllers/payment.controller');
 router.post('/initiate', checkAuth, PaymentController.generate_order);
 router.post('/validate', checkAuth, PaymentController.validate_payment, UserController.update_wallet_balance);
 router.get('/transactions', checkAuth, OrderController.get_transactions);
+// router.post('/webhook')
 
 module.exports = router;

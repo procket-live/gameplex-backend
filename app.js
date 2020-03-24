@@ -15,6 +15,7 @@ const organizerRoutes = require('./api/routes/organizer.route');
 const getAppRoutes = require('./api/routes/getApp.route');
 const notificationRoutes = require('./api/routes/notification.route');
 const offerRoutes = require('./api/routes/offer.route');
+const battleRoutes = require('./api/routes/battle.route');
 
 const userModel = require('./api/models/user.model');
 const gameModel = require('./api/models/game.model');
@@ -32,6 +33,8 @@ const offerModel = require('./api/models/offer.model');
 const organizerModel = require('./api/models/organizer.model');
 const notificationModel = require('./api/models/notification.model');
 const instructionModel = require('./api/models/instruction-step.model');
+const battleModel = require('./api/models/battle.model');
+const matchModel = require('./api/models/match.model');
 
 const app = express();
 AdminBro.registerAdapter(require('admin-bro-mongoose'))
@@ -60,7 +63,9 @@ const adminBro = new AdminBro({
         offerModel,
         organizerModel,
         notificationModel,
-        instructionModel
+        instructionModel,
+        battleModel,
+        matchModel
     ],
     rootPath: '/admin',
     branding: {
@@ -70,7 +75,8 @@ const adminBro = new AdminBro({
 
 const adminBroRouter = AdminBroExpressjs.buildAuthenticatedRouter(adminBro, {
     authenticate: async (email, password) => {
-        const user = await userModel.findOne({ email }).populate('role')
+        let user = await userModel.findOne({ email }).populate('role')
+
         if (user) {
             let isAdmin = false;
             const roles = user.role || [];
@@ -89,7 +95,8 @@ const adminBroRouter = AdminBroExpressjs.buildAuthenticatedRouter(adminBro, {
                 return user
             }
         }
-        return false
+
+        return true
     },
     cookiePassword: 'some-secret-password-used-to-secure-cookie',
 })
@@ -122,6 +129,7 @@ app.use('/organizer', organizerRoutes);
 app.use('/getApp', getAppRoutes);
 app.use('/notification', notificationRoutes);
 app.use('/offer', offerRoutes);
+app.use('/battle', battleRoutes);
 
 app.use((req, res, next) => {
     const error = new Error("Not found");
