@@ -5,6 +5,7 @@ const matchSchema = mongoose.Schema({
     active: { type: Boolean, default: true },
     name: String,
     match_type: { type: String, enum: ['1 VS 1 BATTLE'] },
+    battle: { type: mongoose.Schema.Types.ObjectId, ref: 'Battle' },
     entry_fee: { type: String, require: true },
     winning_amount: { type: String, require: true },
     created_at: { type: Date, default: Date.now },
