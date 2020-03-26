@@ -35,6 +35,8 @@ const notificationModel = require('./api/models/notification.model');
 const instructionModel = require('./api/models/instruction-step.model');
 const battleModel = require('./api/models/battle.model');
 const matchModel = require('./api/models/match.model');
+const battleQueueModel = require('./api/models/battle-queue.model');
+const chatModel = require('./api/models/chat-room.model');
 
 const app = express();
 AdminBro.registerAdapter(require('admin-bro-mongoose'))
@@ -65,7 +67,9 @@ const adminBro = new AdminBro({
         notificationModel,
         instructionModel,
         battleModel,
-        matchModel
+        matchModel,
+        battleQueueModel,
+        chatModel
     ],
     rootPath: '/admin',
     branding: {

@@ -42,12 +42,9 @@ exports.get = (req, res) => {
             path: 'game',
             populate: 'guide'
         })
-        .populate({
-            path: ''
-        })
         .exec()
         .then((result) => {
-            res.status(201).json({
+            return res.status(201).json({
                 success: true,
                 response: result,
             })
@@ -273,8 +270,12 @@ exports.join_tournament = async (req, res, next) => {
         tournamentId = req.tournamentId;
     }
 
-    try {
+    if (req.alreadyJoined) {
+        next();
+        return;
+    }
 
+    try {
         const tournament = await Tournament.findById(tournamentId).exec();
         const user = await User.findById(userId).exec();
         const entryFee = TournamentUtils.calculateEntryFee(tournament.prize || []);
@@ -337,12 +338,17 @@ exports.is_alredy_joined = async (req, res, next) => {
     let tournamentId = req.params.id;
 
     if (req.tournamentId) {
-        tournamentId = tournamentId;
+        tournamentId = req.tournamentId;
     }
 
     const participents = await Participent.find({ tournament: tournamentId, user: userId }).exec();
-
     if (participents.length !== 0) {
+        if (req.battleQueueEntry) {
+            req.alreadyJoined = true;
+            next();
+            return;
+        }
+
         return res.status(200).json({
             success: false,
             response: 'Already joined'
