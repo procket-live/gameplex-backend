@@ -7,6 +7,8 @@ const BattleQueue = require('../models/battle-queue.model');
 const Tournament = require('../models/tournament.model');
 const ChatRoom = require('../models/chat-room.model');
 
+const Notify = require('../controllers/notify.controller');
+
 const TournamentUtils = require('../../utils/tournament.utils');
 const UsernameGenerator = require('username-generator');
 
@@ -85,9 +87,15 @@ exports.is_enough_wallet_amount = async (req, res, next) => {
 
 exports.find_queue_entry = async (req, res, next) => {
     const matchId = req.params.id;
+    const userId = req.userData.userId;
 
     try {
-        const results = await BattleQueue.find({ match: matchId }).exec();
+        const results = await BattleQueue.find({
+            match: matchId,
+            user: {
+                $ne: userId,
+            }
+        }).exec();
         if (results.length > 0) {
             req.battleQueueEntry = results[0];
         }
@@ -143,7 +151,27 @@ exports.create_tournament_for_match = async (req, res, next) => {
     });
 
     const chatRoomId = new mongoose.Types.ObjectId();
-    const chatRoom = new ChatRoom({ _id: chatRoomId });
+    const chatRoom = new ChatRoom({
+        _id: chatRoomId,
+        messages: [
+            {
+                text: "Let's play ",
+                created_by: mongoose.Types.ObjectId('5e7ded1a7055480017df635c')
+            },
+            {
+                text: "You will be notified once you have a opponent",
+                created_by: mongoose.Types.ObjectId('5e7ded1a7055480017df635c')
+            },
+            {
+                text: "Chat with your opponent, then fix the game timing and play the match",
+                created_by: mongoose.Types.ObjectId('5e7ded1a7055480017df635c')
+            },
+            {
+                text: "After match completed. Upload screenshot of scrorecard. Once scorecard is verified your amount will be transferred to your wallet.",
+                created_by: mongoose.Types.ObjectId('5e7ded1a7055480017df635c')
+            }
+        ]
+    });
     await chatRoom.save();
 
     tournament
@@ -252,8 +280,83 @@ exports.get_battle_queue = async (req, res, next) => {
         if (req.tournamentNotCreated) {
             const loggedInUserId = req.userData.userId;
             const users = battleEntry.tournament.participents.map((participent) => participent.user._id).filter((userId) => userId != loggedInUserId);
-            Notify.notify_to_users(users, { title: "Someone has joined match", body: "You got a match. Click hare to proceed.", data: { route: 'BattleQueue', id: battleQueueId } });
+            Notify.notify_to_users(users, { title: "Someone has joined match", body: "You got a opponent. Click here to proceed.", data: { route: 'BattleQueue', id: battleQueueId } });
         }
+
+        return res.status(201).json({
+            success: true,
+            response: battleEntry
+        })
+
+    } catch (err) {
+        return res.status(201).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
+exports.get = async (req, res) => {
+    const battleEntryQueueId = req.params.id;
+
+
+    try {
+        const battleEntry = await BattleQueue
+            .findById(battleEntryQueueId)
+            .populate('match')
+            .populate({
+                path: 'match',
+                populate: {
+                    path: 'battle'
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: {
+                        path: 'platform'
+                    }
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'participents',
+                    populate: {
+                        path: 'user',
+                        select: 'name profile_image'
+                    }
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: {
+                        path: 'game_meta.lookup_type',
+                    }
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: {
+                        path: 'instructions',
+                    }
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: {
+                        path: 'guide',
+                    }
+                }
+            })
+            .exec();
 
         return res.status(201).json({
             success: true,
