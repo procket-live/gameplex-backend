@@ -14,9 +14,10 @@ server.listen(port);
 const io = require("socket.io")(server)
 const ChatRoomUtils = require('./utils/chat-room.utils');
 
+let globalSocket;
 
 io.on("connection", (socket) => {
-    console.log("A user is connected to socket");
+    globalSocket = socket;
 
     socket.on('join', async ({ token, roomId }, callback) => {
         let userData;
@@ -47,11 +48,10 @@ io.on("connection", (socket) => {
         } catch (error) {
             callback(error);
         }
-        console.log('server messagemessage', message)
         const response = await ChatRoomUtils.sendMessage(roomId, userData.userId, message);
         if (response && typeof response == 'object') {
-            console.log('messaage response', response);
-            io.to(roomId).emit('message', response);
+            // io.emit("message", response);
+            io.in(roomId).emit('message', response);
         }
 
         callback();
@@ -61,3 +61,6 @@ io.on("connection", (socket) => {
 io.on("connect", () => {
     console.log("A user is connected to socket");
 })
+
+exports.globalSocket = globalSocket;
+exports.globalIo = io;

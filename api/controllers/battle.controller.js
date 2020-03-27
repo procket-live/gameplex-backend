@@ -10,9 +10,9 @@ const ChatRoom = require('../models/chat-room.model');
 const TournamentUtils = require('../../utils/tournament.utils');
 const UsernameGenerator = require('username-generator');
 
-exports.get_all = async (req, res) => {
-    const userId = req.userData.userId;
+const WEB = require('../../web');
 
+exports.get_all = async (req, res) => {
     try {
         const result = await Battle
             .find({ active: true })
@@ -21,8 +21,6 @@ exports.get_all = async (req, res) => {
             .populate('instructions')
             .populate('match_list')
             .exec();
-
-
 
         res.status(201).json({
             success: true,
@@ -245,6 +243,10 @@ exports.get_battle_queue = async (req, res, next) => {
                 }
             })
             .exec();
+
+        const roomId = battleEntry.chat_room;
+
+        WEB.globalIo.in(roomId).emit('battleQueueUpdate', battleEntry);
 
         return res.status(201).json({
             success: true,
