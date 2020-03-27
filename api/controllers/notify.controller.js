@@ -4,10 +4,10 @@ const User = require('../models/user.model');
 const ChatRoom = require('../models/chat-room.model');
 const BattleQueue = require('../models/battle-queue.model');
 
-function notify(tokens, { title, body, data }) {
+function notify(tokens, { title, body, data }, collapseKey = '') {
     var message = {
         registration_ids: tokens,
-        collapse_key: '',
+        collapse_key: collapseKey,
 
         notification: {
             title: title,
@@ -70,5 +70,5 @@ exports.notify_chat_room = async (roomId, senderId, message) => {
 
     const senderName = sender.user.name;
 
-    notify(tokens, { title: senderName, body: message, data: { route: "BattleQueue", id: battleQueue._id } });
+    notify(tokens, { title: senderName, body: message, data: { route: "BattleQueue", id: battleQueue._id } }, senderId);
 }
