@@ -108,6 +108,7 @@ exports.create_tournament_for_match = async (req, res, next) => {
 
     req.skipResponse = true;
     if (req.battleQueueEntry) {
+        req.tournamentNotCreated = true;
         req.tournamentId = req.battleQueueEntry.tournament;
         next();
         return;
@@ -247,6 +248,12 @@ exports.get_battle_queue = async (req, res, next) => {
         const roomId = battleEntry.chat_room;
 
         WEB.globalIo.in(roomId).emit('battleQueueUpdate', battleEntry);
+
+        if (req.tournamentNotCreated) {
+            const loggedInUserId = req.userData.userId;
+            const users = battleEntry.tournament.participents.map((participent) => participent.user._id).filter((userId) => userId != loggedInUserId);
+            Notify.notify_to_users(users, { title: "Someone has joined match", body: "You got a match. Click hare to proceed.", data: { route: 'BattleQueue', id: battleQueueId } });
+        }
 
         return res.status(201).json({
             success: true,

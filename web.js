@@ -6,6 +6,7 @@ String.prototype.replaceAll = function (search, replacement) {
 const http = require('http');
 const jwt = require('jsonwebtoken');
 const app = require('./app');
+const Notify = require('./api/controllers/notify.controller');
 
 const port = process.env.PORT || 3001;
 const server = http.createServer(app);
@@ -48,10 +49,15 @@ io.on("connection", (socket) => {
         } catch (error) {
             callback(error);
         }
+
         const response = await ChatRoomUtils.sendMessage(roomId, userData.userId, message);
         if (response && typeof response == 'object') {
-            // io.emit("message", response);
             io.in(roomId).emit('message', response);
+            try {
+                Notify.notify_chat_room(roomId, userData.userId, message);
+            } catch (er) {
+                callback(er);
+            }
         }
 
         callback();

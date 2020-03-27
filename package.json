@@ -6,7 +6,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "node web.js",
-        "server": "QBLOX_APP_ID=80891 QBLOX_APP_KEY=dMHKttwQcAVJQGK QBLOX_APP_SECRET=SCdqjUjhky9x3YY  RAZORPAY_ID=rzp_test_VhrhI0BbetdOyJ RAZORPAY_SECRET=DeIWbfSU0PPCQcPb4W9KBPjD  MERCHANT_ID=gzGeYn36130961827220 MERCHANT_KEY=an3MLErs4_k0zT7m JWT_SECRET=232323 SMTP_EMAIL=admin@procket.live SMTP_PASS=Hkxicor12345 nodemon web.js"
+        "server": "FIREBASE_SERVER_KEY=AAAADofQIR0:APA91bEV8wfj8AvkktBrVvhlh_i017TkHwegKdMBquz_w9d4wli3zHGwYodZVHfnbBSrcS8_En0_hhLiJCbadURYVSc1eIomizWSDVPMk7mHQBQ9xTlvZ3-zy4L3Kw86hse_29yuM7Pt QBLOX_APP_ID=80891 QBLOX_APP_KEY=dMHKttwQcAVJQGK QBLOX_APP_SECRET=SCdqjUjhky9x3YY  RAZORPAY_ID=rzp_test_VhrhI0BbetdOyJ RAZORPAY_SECRET=DeIWbfSU0PPCQcPb4W9KBPjD  MERCHANT_ID=gzGeYn36130961827220 MERCHANT_KEY=an3MLErs4_k0zT7m JWT_SECRET=232323 SMTP_EMAIL=admin@procket.live SMTP_PASS=Hkxicor12345 nodemon web.js"
     },
     "author": "",
     "license": "ISC",

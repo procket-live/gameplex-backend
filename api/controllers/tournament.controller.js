@@ -4,6 +4,7 @@ const Tournament = require('../models/tournament.model');
 const Participent = require('../models/participent.model');
 const User = require('../models/user.model');
 const TournamentUtils = require('../../utils/tournament.utils');
+const Notify = require('../controllers/notify.controller');
 
 exports.get = (req, res) => {
     let tournamentId = req.params.id;
@@ -147,7 +148,6 @@ exports.get_upcoming_active = (req, res) => {
         tournament_start_time: { $gt: Date.now() },
         'participents.user._id': userId
     };
-    console.log('filter', filter)
 
     Tournament
         .find(filter)
