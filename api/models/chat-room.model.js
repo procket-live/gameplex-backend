@@ -8,6 +8,7 @@ const chatRoomSchema = mongoose.Schema({
             created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
             text: String,
             media: [String],
+            image: String,
             created_at: { type: Date, default: Date.now }
         }
     ],

@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
         console.log("user had left");
     })
 
-    socket.on('sendMessage', async ({ token, roomId, message }, callback) => {
+    socket.on('sendMessage', async ({ token, roomId, message, image }, callback) => {
         let userData;
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
             callback(error);
         }
 
-        const response = await ChatRoomUtils.sendMessage(roomId, userData.userId, message);
+        const response = await ChatRoomUtils.sendMessage(roomId, userData.userId, message, image);
         if (response && typeof response == 'object') {
             io.in(roomId).emit('message', response);
             try {
