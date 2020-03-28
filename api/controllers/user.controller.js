@@ -420,7 +420,8 @@ exports.update_wallet_balance = async (req, res, next) => {
         const walletTransactions = {
             amount: amount,
             target: "cash_balance",
-            source: source
+            source: source,
+            source_name: "Tournament"
         };
 
         if (order_id) {

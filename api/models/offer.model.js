@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const offerSchema = mongoose.Schema({
     _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+    name: String,
     message: { type: mongoose.Schema.Types.String },
     image: { type: mongoose.Schema.Types.String },
     created_by: { type: mongoose.Schema.ObjectId, ref: 'User' },

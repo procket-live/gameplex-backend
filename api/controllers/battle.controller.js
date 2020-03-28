@@ -10,7 +10,6 @@ const ChatRoom = require('../models/chat-room.model');
 const Notify = require('../controllers/notify.controller');
 
 const TournamentUtils = require('../../utils/tournament.utils');
-const UsernameGenerator = require('username-generator');
 
 const WEB = require('../../web');
 
@@ -51,7 +50,6 @@ exports.attach_match = async (req, res, next) => {
         req.match = match;
         next();
     } catch (err) {
-        console.log("RTTT")
         return res.status(201).json({
             success: false,
             response: err
@@ -64,7 +62,6 @@ exports.is_enough_wallet_amount = async (req, res, next) => {
     const match = req.match;
     try {
         const user = await User.findById(userId).select('-_id wallet_cash_balance').exec();
-        console.log('user', user);
         const walletAmount = TournamentUtils.calculateWalletAmount(user);
         const entryFee = parseInt(match.entry_fee);
 
@@ -122,15 +119,12 @@ exports.create_tournament_for_match = async (req, res, next) => {
         return;
     }
 
-
-    const randomname = UsernameGenerator.generateUsername();
     const _id = new mongoose.Types.ObjectId();
-
     const tournament = new Tournament({
         _id,
         status: 'active',
         game: battle.game,
-        tournament_name: match.name + "_" + randomname,
+        tournament_name: match.name,
         prize: [
             {
                 _id: new mongoose.Types.ObjectId(),

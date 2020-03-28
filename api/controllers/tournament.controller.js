@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const Tournament = require('../models/tournament.model');
 const Participent = require('../models/participent.model');
 const User = require('../models/user.model');
+const Game = require('../models/game.model');
+const LookupType = require('../models/lookup-type.model');
+
 const TournamentUtils = require('../../utils/tournament.utils');
 const Notify = require('../controllers/notify.controller');
 
@@ -23,13 +26,6 @@ exports.get = (req, res) => {
             }
         })
         .populate({
-            path: 'participents',
-            populate: {
-                path: 'user',
-                select: 'name profile_image'
-            }
-        })
-        .populate({
             path: 'game',
             populate: {
                 path: 'game_meta.lookup_type',
@@ -37,11 +33,22 @@ exports.get = (req, res) => {
         })
         .populate({
             path: 'game',
-            populate: 'instructions'
+            populate: {
+                path: 'instructions',
+            }
         })
         .populate({
             path: 'game',
-            populate: 'guide'
+            populate: {
+                path: 'guide',
+            }
+        })
+        .populate({
+            path: 'participents',
+            populate: {
+                path: 'user',
+                select: 'name profile_image'
+            }
         })
         .exec()
         .then((result) => {
@@ -171,7 +178,6 @@ exports.get_upcoming_active = (req, res) => {
         })
         .exec()
         .then((results) => {
-            console.log('results', results)
             return res.status(201).json({
                 success: true,
                 response: results,
@@ -428,9 +434,7 @@ exports.set_ranking = async (req, res) => {
                 $set: {
                     result_meta: item.result_meta
                 }
-            }).exec().then((result) => {
-                console.log('resultTTT', result);
-            });
+            }).exec();
         })
 
         await Tournament.findByIdAndUpdate(id, { $set: { ranking_set: true } }).exec();
@@ -473,24 +477,58 @@ exports.get_my_tournaments = async (req, res) => {
     try {
         const result = await Participent
             .find({ user: userId }, '-_id tournament')
-            .populate(
-                {
-                    path: 'tournament',
+            .sort('-created_at')
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: 'platform'
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'organizer',
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'participents',
                     populate: {
-                        path: 'game',
-                        populate: 'platform'
+                        path: 'user',
+                        select: 'name profile_image'
                     }
-                })
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: 'instructions'
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: 'guide'
+                }
+            })
             .exec();
 
         const joined = [];
         const completed = [];
 
-        result.forEach((item = {}) => {
-            if (item.tournament.status == "completed") {
-                completed.push(item.tournament);
-            } else {
-                joined.push(item.tournament);
+        result.filter((item = {}) => item.tournament != null).forEach((item = {}) => {
+            const tournament = item.tournament || {};
+
+            if (tournament.status == "completed") {
+                completed.push(tournament);
+            }
+
+            if (tournament.status == "active") {
+                joined.push(tournament);
             }
         })
 

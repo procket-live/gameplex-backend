@@ -7,8 +7,6 @@ exports.init = function (callback) {
         authSecret: process.env.QBLOX_APP_SECRET
     };
 
-    console.log('CREDENTIALS', CREDENTIALS)
-
     const QB = new QuickBlox();
     QB.init(CREDENTIALS.appId, CREDENTIALS.authKey, CREDENTIALS.authSecret);
     var params = { login: "hkxicor", password: "a$123456" };

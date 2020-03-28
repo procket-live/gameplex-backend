@@ -38,7 +38,6 @@ io.on("connection", (socket) => {
 
 
     socket.on('disconnect', () => {
-        console.log("user had left");
     })
 
     socket.on('sendMessage', async ({ token, roomId, message, image }, callback) => {

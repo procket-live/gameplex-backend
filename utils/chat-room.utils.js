@@ -29,7 +29,6 @@ exports.sendMessage = async function (roomId, userId, message, image) {
         }).exec();
         return messageObject;
     } catch (err) {
-        console.log('errrr', err)
         return false;
     }
 }

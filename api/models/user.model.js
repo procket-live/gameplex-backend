@@ -27,7 +27,7 @@ const userSchema = mongoose.Schema({
     wallet_transactions: [{
         amount: { type: Number },
         target: { type: String, enum: ['cash_balance', 'bonous_balance'], require: true },
-        source: { type: mongoose.Schema.Types.ObjectId },
+        source: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament' },
         source_name: String,
         deleted_at: { type: Date, default: null },
         created_at: { type: Date, default: Date.now },

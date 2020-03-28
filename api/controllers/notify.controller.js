@@ -69,7 +69,6 @@ exports.notify_chat_room = async (roomId, senderId, message) => {
         const tokens = participents.map((participent) => participent.user.firebase_token);
         const sender = battleQueueEntry.tournament.participents.filter((participent) => participent.user._id == senderId)[0];
         const senderName = sender.user.name;
-        console.log('battleQueueEntry', battleQueueEntry);
         notify(tokens, { title: senderName, body: message, data: { route: "BattleQueue", value: battleQueueEntry._id } }, senderId);
     } catch (err) {
         console.log(err);

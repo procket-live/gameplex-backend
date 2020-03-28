@@ -22,12 +22,9 @@ exports.get_dashboard_meta = async (req, res) => {
                 }
             }
         };
-        console.log('1111')
+
         return res.status(201).json(response);
-
     } catch (err) {
-        console.log('1111')
-
         return res.status(201).json({
             success: false,
             response: err

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const lookupTypeSchema = mongoose.Schema({
-    _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+    _id: { type: mongoose.Schema.Types.ObjectId },
     name: String,
     description: String,
     values: [{

@@ -8,6 +8,7 @@ const battleSchema = mongoose.Schema({
     offers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Offer', require: true }],
     instructions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'InstructionStep', require: true }],
     match_list: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Match', require: true }],
+    battle_type: { type: String, enum: ['match', 'fantasy', 'gather'] },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
     deleted_at: { type: Date, default: null },

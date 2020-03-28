@@ -8,7 +8,6 @@ exports.generate_order = (req, res) => {
     const amount = req.body.amount;
 
     const instance = Razorpay.getRazorpayInstance();
-    console.log('instance', instance)
     const _id = new mongoose.Types.ObjectId();
 
     var options = {
