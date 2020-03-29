@@ -91,7 +91,8 @@ exports.find_queue_entry = async (req, res, next) => {
             match: matchId,
             user: {
                 $ne: userId,
-            }
+            },
+            full: false
         }).exec();
         if (results.length > 0) {
             req.battleQueueEntry = results[0];
@@ -208,7 +209,6 @@ exports.create_tournament_for_match = async (req, res, next) => {
 exports.get_battle_queue = async (req, res, next) => {
     const battleEntryQueueId = req.battleQueueEntry._id;
 
-
     try {
         const battleEntry = await BattleQueue
             .findById(battleEntryQueueId)
@@ -272,14 +272,17 @@ exports.get_battle_queue = async (req, res, next) => {
         WEB.globalIo.in(roomId).emit('battleQueueUpdate', battleEntry);
 
         try {
+            console.log('tnc')
             if (req.tournamentNotCreated) {
+                console.log('inside')
                 const loggedInUserId = req.userData.userId;
+                console.log('loggedInUserId', loggedInUserId);
                 const users = battleEntry.tournament.participents.map((participent) => participent.user._id).filter((userId) => userId != loggedInUserId);
-
+                console.log('totototot', users)
                 Notify.notify_to_users(users, { title: "Someone has joined match", body: "You got a opponent. Click here to proceed.", data: { route: 'BattleQueue', id: battleQueueId } });
-
             }
         } catch (err) {
+            console.log('error', err);
             console.log(err);
         }
 
@@ -298,7 +301,6 @@ exports.get_battle_queue = async (req, res, next) => {
 
 exports.get = async (req, res) => {
     const battleEntryQueueId = req.params.id;
-
 
     try {
         const battleEntry = await BattleQueue
@@ -457,4 +459,19 @@ exports.get_joined_battle_queue = async (req, res) => {
             response: err
         })
     }
+}
+
+exports.mark_battle_queue_as_full = async (req, res, next) => {
+    const battleQueueEntry = req.battleQueueEntry || {};
+    const id = battleQueueEntry._id;
+
+    if (req.tournamentNotCreated) {
+        try {
+            await BattleQueue.findByIdAndUpdate(id, { $set: { full: true } }).exec()
+        } catch (err) {
+            console.log('err', err);
+        }
+    }
+
+    next();
 }
