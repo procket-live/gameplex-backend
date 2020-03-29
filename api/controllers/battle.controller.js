@@ -271,10 +271,16 @@ exports.get_battle_queue = async (req, res, next) => {
 
         WEB.globalIo.in(roomId).emit('battleQueueUpdate', battleEntry);
 
-        if (req.tournamentNotCreated) {
-            const loggedInUserId = req.userData.userId;
-            const users = battleEntry.tournament.participents.map((participent) => participent.user._id).filter((userId) => userId != loggedInUserId);
-            Notify.notify_to_users(users, { title: "Someone has joined match", body: "You got a opponent. Click here to proceed.", data: { route: 'BattleQueue', id: battleQueueId } });
+        try {
+            if (req.tournamentNotCreated) {
+                const loggedInUserId = req.userData.userId;
+                const users = battleEntry.tournament.participents.map((participent) => participent.user._id).filter((userId) => userId != loggedInUserId);
+
+                Notify.notify_to_users(users, { title: "Someone has joined match", body: "You got a opponent. Click here to proceed.", data: { route: 'BattleQueue', id: battleQueueId } });
+
+            }
+        } catch (err) {
+            console.log(err);
         }
 
         return res.status(201).json({
@@ -285,7 +291,7 @@ exports.get_battle_queue = async (req, res, next) => {
     } catch (err) {
         return res.status(201).json({
             success: false,
-            response: err
+            response: 'get battle queue error'
         })
     }
 }
