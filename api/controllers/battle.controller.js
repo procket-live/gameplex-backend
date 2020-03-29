@@ -268,21 +268,14 @@ exports.get_battle_queue = async (req, res, next) => {
             .exec();
 
         const roomId = battleEntry.chat_room;
-
         WEB.globalIo.in(roomId).emit('battleQueueUpdate', battleEntry);
 
         try {
-            console.log('tnc')
             if (req.tournamentNotCreated) {
-                console.log('inside')
                 const loggedInUserId = req.userData.userId;
-                console.log('loggedInUserId', loggedInUserId);
-                const users = battleEntry.tournament.participents.map((participent) => participent.user._id).filter((userId) => userId != loggedInUserId);
-                console.log('totototot', users)
-                Notify.notify_to_users(users, { title: "Someone has joined match", body: "You got a opponent. Click here to proceed.", data: { route: 'BattleQueue', id: battleQueueId } });
+                Notify.notify_chat_room(roomId, loggedInUserId, "We got match !!! Let's Play")
             }
         } catch (err) {
-            console.log('error', err);
             console.log(err);
         }
 

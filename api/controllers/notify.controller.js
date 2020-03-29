@@ -1,4 +1,5 @@
 const FCM = require('fcm-node');
+const mongoose = require('mongoose');
 const fcm = new FCM(process.env.FIREBASE_SERVER_KEY);
 const User = require('../models/user.model');
 const ChatRoom = require('../models/chat-room.model');
