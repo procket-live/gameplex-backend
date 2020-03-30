@@ -41,7 +41,7 @@ const chatModel = require('./api/models/chat-room.model');
 const app = express();
 AdminBro.registerAdapter(require('admin-bro-mongoose'))
 const yo = mongoose.connect(
-    'mongodb+srv://gameplex-user:pg60EeT5o8NtQEDa@cluster0-jnmvx.mongodb.net/gameplex?retryWrites=true&w=majority',
+    process.env.MONGO || 'mongodb+srv://gameplex-user:pg60EeT5o8NtQEDa@cluster0-jnmvx.mongodb.net/gameplex?retryWrites=true&w=majority',
     {
         useNewUrlParser: true
     }
