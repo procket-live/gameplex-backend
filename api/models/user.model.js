@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema({
     username: String,
     quickblox_secret: String,
     quickblox_id: String,
-    email: { type: String, unique: true },
+    email: { type: String, unique: false },
     password: { type: String },
     gender: { type: String, enum: ['Male', 'Female', 'Other'] },
     points: { type: Number, default: 0 },

@@ -64,8 +64,9 @@ exports.create_user_if_not_exist = (req, res, next) => {
             if (users.length == 0) {
                 const username = UsernameGenerator.generateUsername();
 
+                const Id = new mongoose.Types.ObjectId();
                 const user = new User({
-                    _id: new mongoose.Types.ObjectId(),
+                    _id: Id,
                     mobile,
                     username,
                 });
@@ -73,7 +74,7 @@ exports.create_user_if_not_exist = (req, res, next) => {
                 user
                     .save()
                     .then(() => {
-                        User.findOne({ mobile })
+                        User.findById(Id)
                             .exec()
                             .then((newUser) => {
                                 req.userId = newUser._id;
@@ -107,9 +108,6 @@ exports.generate_otp = (req, res, next) => {
             const mobile = user.mobile;
 
             let generatedOtp = Math.floor(1000 + Math.random() * 9000);
-            if (mobile == '9731702355') {
-                generatedOtp = '1234';
-            }
 
             const _id = new mongoose.Types.ObjectId();
             const otp = new OTP({
@@ -139,7 +137,12 @@ exports.generate_otp = (req, res, next) => {
                         response: 'something went wrong'
                     });
                 })
-        });
+        }).catch(() => {
+            return res.status(200).json({
+                success: false,
+                response: 'Unable to find user'
+            });
+        })
 }
 
 exports.resend_otp = (req, res) => {
