@@ -63,16 +63,11 @@ exports.create_user_if_not_exist = (req, res, next) => {
         .then((users) => {
             if (users.length == 0) {
                 const username = UsernameGenerator.generateUsername();
-                var quickblox_secret = generator.generate({
-                    length: 10,
-                    numbers: true
-                });
 
                 const user = new User({
                     _id: new mongoose.Types.ObjectId(),
                     mobile,
                     username,
-                    quickblox_secret
                 });
 
                 user
@@ -85,7 +80,6 @@ exports.create_user_if_not_exist = (req, res, next) => {
                                 req.profile = profile;
                                 req.mobile = mobile;
                                 req.username = username;
-                                req.quickblox_secret = quickblox_secret;
                                 next();
                             })
                     })
@@ -99,7 +93,6 @@ exports.create_user_if_not_exist = (req, res, next) => {
                 req.userId = users[0]._id;
                 req.profile = profile;
                 req.mobile = mobile;
-                req.skipQblox = true;
                 next();
             }
         })

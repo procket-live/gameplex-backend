@@ -6,7 +6,7 @@ const checkAuth = require('../middlewares/check-auth');
 
 router.get('/', checkAuth, UserController.get_user);
 router.put('/', checkAuth, UserController.update_user);
-router.post('/generate-otp', UserController.create_user_if_not_exist, UserController.create_qblox_account, UserController.generate_otp);
+router.post('/generate-otp', UserController.create_user_if_not_exist, UserController.generate_otp);
 router.post('/verify-otp', UserController.verify_otp);
 router.get('/ganerate-email-otp', checkAuth, UserController.generate_email_otp);
 router.post('/verify-email-otp', checkAuth, UserController.verify_email_otp);
