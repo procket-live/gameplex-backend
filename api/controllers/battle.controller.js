@@ -427,13 +427,15 @@ exports.get_joined_battle_queue = async (req, res) => {
                 }
             })
             .exec();
-
+        console.log('battleEntry', battleEntry)
         const filerData = battleEntry.filter(entry => {
             const participents = entry.tournament.participents || [];
             let got = false;
 
-            participents.forEach((item) => {
-                if (userId == item.user._id) {
+            participents.forEach((item = {}) => {
+                const userEntry = item.user || {};
+                const userEntryId = userEntry._id;
+                if (userId == userEntryId) {
                     got = true;
                 }
             })

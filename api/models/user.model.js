@@ -24,9 +24,10 @@ const userSchema = mongoose.Schema({
     role: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role', require: true }],
     wallet_cash_balance: { type: Number, default: 0 },
     wallet_bonous_balance: { type: Number, default: 0 },
+    wallet_win_balance: { type: Number, default: 0 },
     wallet_transactions: [{
         amount: { type: Number },
-        target: { type: String, enum: ['cash_balance', 'bonous_balance'], require: true },
+        target: { type: String, enum: ['cash_balance', 'bonous_balance', 'win_balance'], require: true },
         source: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament' },
         source_name: String,
         deleted_at: { type: Date, default: null },

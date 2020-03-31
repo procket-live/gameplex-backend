@@ -2,11 +2,10 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 const jwt = require('jsonwebtoken');
 const UsernameGenerator = require('username-generator');
-var generator = require('generate-password');
-const QB = require('../../utils/quickblox.utils');
 
 const User = require('../models/user.model');
 const OTP = require('../models/otp.model');
+const BankAccount = require('../models/bank-account.model');
 
 const sendSMS = require('../../utils/send-sms');
 const sendEmail = require('../../utils/send-email');
@@ -518,42 +517,40 @@ exports.wallet_transactions = async (req, res) => {
     }
 }
 
-exports.create_qblox_account = (req, res, next) => {
-    if (req.skipQblox) {
-        next();
-    }
+exports.add_bank_account = async (req, res, next) => {
+    try {
+        const userId = req.userData.userId;
 
-    const userId = req.userId;
-    const username = req.username;
-    const password = req.quickblox_secret;
-
-    var params = {
-        login: username,
-        password: password
-    };
-
-    QB.init(({ qb, err }) => {
-        if (err) {
-            next();
-            return;
-        }
-
-        qb.users.create(params, async function (err, response) {
-            console.log('TOTOTOTOT', err, response);
-            if (err) {
-                next();
-                return;
-            }
-
-            await User.findByIdAndUpdate(
-                userId,
-                {
-                    $set: {
-                        quickblox_id: String(response.id)
-                    }
-                }).exec();
-
-            next();
+        const bankAccount = new BankAccount({
+            accont_number: req.body.accont_number,
+            user_name: req.body.user_name,
+            ifsc: req.body.ifsc,
+            created_by: userId
         });
-    });
+
+        await bankAccount.save();
+        next();
+        return;
+    } catch (err) {
+        res.status(200).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
+exports.get_bank_account = async (req, res) => {
+    const userId = req.userData.userId;
+    try {
+        const result = await BankAccount.findOne({ created_by: userId }).exec();
+        return res.status(200).json({
+            success: true,
+            response: result
+        });
+    } catch (err) {
+        res.status(200).json({
+            success: false,
+            response: err
+        })
+    }
 }

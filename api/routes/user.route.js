@@ -14,5 +14,7 @@ router.get('/resend-otp/:id', UserController.resend_otp);
 router.post('/add-game-user-id/:id', checkAuth, UserController.add_game_id);
 router.post('/wallet', checkAuth, UserController.get_wallet_balance);
 router.get('/wallet/transactions', checkAuth, UserController.wallet_transactions);
+router.get('/bank', checkAuth, UserController.get_bank_account);
+router.post('/bank', checkAuth, UserController.add_bank_account, UserController.get_bank_account);
 
 module.exports = router;
