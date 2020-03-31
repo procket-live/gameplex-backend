@@ -87,7 +87,7 @@ exports.create_user_if_not_exist = (req, res, next) => {
                     .catch((err) => {
                         res.status(200).json({
                             success: false,
-                            response: err
+                            response: 'MYY' + err
                         })
                     })
             } else {
@@ -115,6 +115,7 @@ exports.generate_otp = (req, res, next) => {
                 mobile,
                 user: userId,
                 otp: generatedOtp,
+                email_address: '',
                 otp_type: 'mobile',
                 expires_at: moment().add('15', 'minutes').toDate(),
                 created_at: Date.now(),
