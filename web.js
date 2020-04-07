@@ -21,7 +21,6 @@ io.on("connection", (socket) => {
     globalSocket = socket;
 
     socket.on('join', async ({ token, roomId }, callback) => {
-        let userData;
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             userData = decoded;

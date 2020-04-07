@@ -89,7 +89,7 @@ exports.find_queue_entry = async (req, res, next) => {
     try {
         const results = await BattleQueue.find({
             match: matchId,
-            user: {
+            created_by: {
                 $ne: userId,
             },
             full: false
@@ -138,6 +138,13 @@ exports.create_tournament_for_match = async (req, res, next) => {
                 value: match.winning_amount
             }
         ],
+        rank: [
+            {
+                _id: new mongoose.Types.ObjectId(),
+                rank: 1,
+                amount: match.winning_amount
+            }
+        ],
         size: 2,
         registration_opening: Date.now(),
         registration_closing: null,
@@ -151,19 +158,19 @@ exports.create_tournament_for_match = async (req, res, next) => {
         messages: [
             {
                 text: "Let's play ",
-                created_by: mongoose.Types.ObjectId('5e7ded1a7055480017df635c')
+                created_by: mongoose.Types.ObjectId('5e8b820063a73d0017b149da')
             },
             {
                 text: "You will be notified once you have a opponent",
-                created_by: mongoose.Types.ObjectId('5e7ded1a7055480017df635c')
+                created_by: mongoose.Types.ObjectId('5e8b820063a73d0017b149da')
             },
             {
                 text: "Chat with your opponent, then fix the game timing and play the match",
-                created_by: mongoose.Types.ObjectId('5e7ded1a7055480017df635c')
+                created_by: mongoose.Types.ObjectId('5e8b820063a73d0017b149da')
             },
             {
                 text: "After match completed. Upload screenshot of scrorecard. Once scorecard is verified your amount will be transferred to your wallet.",
-                created_by: mongoose.Types.ObjectId('5e7ded1a7055480017df635c')
+                created_by: mongoose.Types.ObjectId('5e8b820063a73d0017b149da')
             }
         ]
     });
@@ -177,7 +184,6 @@ exports.create_tournament_for_match = async (req, res, next) => {
             const battleQueueEntry = new BattleQueue({
                 _id: battleQueueId,
                 match: match._id,
-                user: userId,
                 chat_room: chatRoom,
                 battle: battle._id,
                 tournament: _id,
@@ -206,7 +212,7 @@ exports.create_tournament_for_match = async (req, res, next) => {
         })
 }
 
-exports.get_battle_queue = async (req, res, next) => {
+exports.get_battle_queue = async (req, res) => {
     const battleEntryQueueId = req.battleQueueEntry._id;
 
     try {
@@ -292,6 +298,53 @@ exports.get_battle_queue = async (req, res, next) => {
     }
 }
 
+exports.upload_scrorecard = async (req, res, next) => {
+    const battleEntryQueueId = req.params.id;
+    const link = req.body.link;
+    const userId = req.userData.userId;
+
+    try {
+        await BattleQueue.update({ _id: battleEntryQueueId }, {
+            $set: {
+                scorecard: {
+                    image_link: link,
+                    created_by: userId
+                }
+            }
+        }).exec();
+
+        return res.status(201).json({
+            success: true,
+        })
+    } catch (err) {
+        return res.status(201).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
+exports.mark_complete = async (req, res) => {
+    const battleEntryQueueId = req.params.id;
+
+    try {
+        await BattleQueue.update({ _id: battleEntryQueueId }, {
+            $set: {
+                completed: true
+            }
+        }).exec();
+
+        return res.status(201).json({
+            success: true,
+        })
+    } catch (err) {
+        return res.status(201).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
 exports.get = async (req, res) => {
     const battleEntryQueueId = req.params.id;
 
@@ -366,13 +419,12 @@ exports.get = async (req, res) => {
     }
 }
 
-exports.get_joined_battle_queue = async (req, res) => {
-    const userId = req.userData.userId;
-    const battleId = req.params.id;
+exports.get_all_completed_battle_queue = async (req, res) => {
+    const query = { deleted_at: { $eq: null }, completed: { $eq: true } };
 
     try {
         const battleEntry = await BattleQueue
-            .find({ 'battle': battleId })
+            .find(query)
             .populate('match')
             .populate({
                 path: 'match',
@@ -427,7 +479,87 @@ exports.get_joined_battle_queue = async (req, res) => {
                 }
             })
             .exec();
-        console.log('battleEntry', battleEntry)
+
+        return res.status(201).json({
+            success: true,
+            response: battleEntry
+        })
+
+    } catch (err) {
+        return res.status(201).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
+exports.get_joined_battle_queue = async (req, res) => {
+    const userId = req.userData.userId;
+    const battleId = req.params.id;
+
+    const query = { deleted_at: { $eq: null } };
+
+    if (battleId) {
+        query['battle'] = battleId;
+    }
+
+    try {
+        const battleEntry = await BattleQueue
+            .find(query)
+            .populate('match')
+            .populate({
+                path: 'match',
+                populate: {
+                    path: 'battle'
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: {
+                        path: 'platform'
+                    }
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'participents',
+                    populate: {
+                        path: 'user',
+                        select: 'name profile_image'
+                    }
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: {
+                        path: 'game_meta.lookup_type',
+                    }
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: {
+                        path: 'instructions',
+                    }
+                }
+            })
+            .populate({
+                path: 'tournament',
+                populate: {
+                    path: 'game',
+                    populate: {
+                        path: 'guide',
+                    }
+                }
+            })
+            .exec();
         const filerData = battleEntry.filter(entry => {
             const participents = entry.tournament.participents || [];
             let got = false;

@@ -5,6 +5,7 @@ const battleSchema = mongoose.Schema({
     active: { type: Boolean, default: true },
     game: { type: mongoose.Schema.Types.ObjectId, ref: 'Game', require: true },
     name: String,
+    completed: { type: Boolean, default: false },
     offers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Offer', require: true }],
     instructions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'InstructionStep', require: true }],
     match_list: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Match', require: true }],
