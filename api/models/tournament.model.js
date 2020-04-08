@@ -29,6 +29,7 @@ const tournamentSchema = mongoose.Schema({
     size: Number,
     registration_opening: Date,
     ranking_set: { type: Boolean, default: false },
+    payout_released: { type: Boolean, default: false },
     registration_closing: Date,
     tournament_start_time: Date,
     form_message: String,

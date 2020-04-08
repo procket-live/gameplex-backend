@@ -223,10 +223,10 @@ exports.add = (req, res) => {
 }
 
 exports.edit = (req, res) => {
-    const userId = req.userData.userId;
-
     Tournament
-        .update({ _id: req.params.id, created_by: userId }, {
+        .update({
+            _id: req.params.id
+        }, {
             $set: req.body
         })
         .exec()
@@ -430,7 +430,7 @@ exports.set_ranking = async (req, res) => {
 
     try {
         record.forEach(async (item) => {
-            await Participent.findByIdAndUpdate(item.participentId, {
+            const result = await Participent.findByIdAndUpdate(item.participentId, {
                 $set: {
                     result_meta: item.result_meta
                 }
@@ -467,8 +467,73 @@ exports.set_ranking = async (req, res) => {
     }
 }
 
-exports.calculate = async (req, res) => {
+exports.rollout_payment = async (req, res) => {
+    let tournamentId = req.params.id;
 
+    try {
+        const tournament = await Tournament
+            .findById(tournamentId)
+            .select('participents payout_released rank')
+            .populate({
+                path: 'participents',
+                populate: {
+                    path: 'user',
+                    select: 'name profile_image'
+                }
+            })
+            .exec();
+        if (tournament.payout_released) {
+            return res.status(200).json({
+                success: false,
+                response: 'Payout is done'
+            });
+        }
+
+        const participents = tournament.participents || [];
+        const rankWiseAmount = {};
+
+        tournament.rank.forEach((rankItem) => {
+            rankWiseAmount[rankItem.rank] = rankItem.amount;
+        })
+
+        console.log('rankWiseAmount', rankWiseAmount)
+
+        participents.forEach(async (item = {}) => {
+            const rank = item.result_meta_rank;
+
+            if (rank) {
+                const userId = item.user._id;
+                const winAmount = rankWiseAmount[rank];
+                const walletTransaction = {
+                    amount: winAmount,
+                    target: "win_balance",
+                    source: tournamentId,
+                    source_name: "Tournament"
+                };
+
+
+                await User.findByIdAndUpdate(userId, {
+                    $inc: {
+                        wallet_win_balance: Number(winAmount)
+                    },
+                    $push: {
+                        wallet_transactions: walletTransaction
+                    }
+                }).exec();
+            }
+        })
+
+        await Tournament.findByIdAndUpdate(tournamentId, { $set: { payout_released: true } })
+        return res.status(200).json({
+            success: true,
+            response: "Payout released"
+        });
+    } catch (err) {
+        return res.status(200).json({
+            success: false,
+            response: err
+        });
+    }
 }
 
 exports.get_my_tournaments = async (req, res) => {

@@ -419,8 +419,32 @@ exports.get = async (req, res) => {
     }
 }
 
+exports.make_payout_released = async (req, res) => {
+    const battleEntryQueueId = req.params.id;
+
+    try {
+        await BattleQueue.findByIdAndUpdate(battleEntryQueueId, { $set: { payout_released: true } }).exec();
+
+        Notify.notify_to_users
+
+        return res.status(201).json({
+            success: true,
+        })
+    } catch (err) {
+        return res.status(201).json({
+            success: false,
+            response: err
+        })
+    }
+}
+
+
 exports.get_all_completed_battle_queue = async (req, res) => {
-    const query = { deleted_at: { $eq: null }, completed: { $eq: true } };
+    let query = { deleted_at: { $eq: null }, completed: { $eq: true }, $or: [{ payout_released: false }, { payout_released: null }] };
+
+    if (req.query.active == 'true') {
+        query = { deleted_at: { $eq: null }, completed: { $eq: false } };
+    }
 
     try {
         const battleEntry = await BattleQueue
@@ -497,7 +521,7 @@ exports.get_joined_battle_queue = async (req, res) => {
     const userId = req.userData.userId;
     const battleId = req.params.id;
 
-    const query = { deleted_at: { $eq: null } };
+    const query = { deleted_at: { $eq: null }, $or: [{ payout_released: false }, { payout_released: null }] };
 
     if (battleId) {
         query['battle'] = battleId;

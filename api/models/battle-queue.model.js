@@ -9,6 +9,7 @@ const battleQueueSchema = mongoose.Schema({
     chat_room: { type: mongoose.Schema.Types.ObjectId, require: true, ref: "ChatRoom" },
     scorecard: { image_link: String, created_by: { type: mongoose.Schema.Types.ObjectId, require: true, ref: "User" } },
     completed: { type: Boolean, default: false },
+    payout_released: { type: Boolean, default: false },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
     deleted_at: { type: Date, default: null },
