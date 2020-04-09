@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const app = require('./app');
 const Notify = require('./api/controllers/notify.controller');
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 8081;
 const server = http.createServer(app);
 server.listen(port);
 
