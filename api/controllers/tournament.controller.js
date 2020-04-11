@@ -496,11 +496,8 @@ exports.rollout_payment = async (req, res) => {
             rankWiseAmount[rankItem.rank] = rankItem.amount;
         })
 
-        console.log('rankWiseAmount', rankWiseAmount)
-
         participents.forEach(async (item = {}) => {
-            const rank = item.result_meta_rank;
-
+            const rank = item.result_meta.rank;
             if (rank) {
                 const userId = item.user._id;
                 const winAmount = rankWiseAmount[rank];
@@ -511,10 +508,9 @@ exports.rollout_payment = async (req, res) => {
                     source_name: "Tournament"
                 };
 
-
                 await User.findByIdAndUpdate(userId, {
                     $inc: {
-                        wallet_win_balance: Number(winAmount)
+                        wallet_win_balance: Number(Math.abs(winAmount))
                     },
                     $push: {
                         wallet_transactions: walletTransaction

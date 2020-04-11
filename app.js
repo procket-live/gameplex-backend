@@ -38,6 +38,7 @@ const matchModel = require('./api/models/match.model');
 const battleQueueModel = require('./api/models/battle-queue.model');
 const chatModel = require('./api/models/chat-room.model');
 const appReleaseModel = require('./api/models/release.model');
+const withdrawRequestModel = require('./api/models/withdrawal-request.model');
 
 const app = express();
 AdminBro.registerAdapter(require('admin-bro-mongoose'))
@@ -71,7 +72,8 @@ const adminBro = new AdminBro({
         matchModel,
         battleQueueModel,
         chatModel,
-        appReleaseModel
+        appReleaseModel,
+        withdrawRequestModel
     ],
     rootPath: '/admin',
     branding: {
