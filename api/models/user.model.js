@@ -33,7 +33,10 @@ const userSchema = mongoose.Schema({
         deleted_at: { type: Date, default: null },
         created_at: { type: Date, default: Date.now },
     }],
-    game_ids: [{ game: mongoose.Schema.Types.ObjectId, user_id: String }]
+    game_ids: [{ game: mongoose.Schema.Types.ObjectId, user_id: String }],
+    created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date, default: Date.now },
+    deleted_at: { type: Date }
 });
 
 module.exports = mongoose.model('User', userSchema);

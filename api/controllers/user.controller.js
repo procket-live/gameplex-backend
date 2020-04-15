@@ -67,7 +67,7 @@ exports.create_user_if_not_exist = (req, res, next) => {
                 const user = new User({
                     _id: Id,
                     mobile,
-                    username,
+                    username
                 });
 
                 user
@@ -287,7 +287,7 @@ exports.verify_otp = (req, res) => {
                     .catch((err) => {
                         return res.status(200).json({
                             success: false,
-                            response: err + "gand mra li"
+                            response: err + 'something went wrong'
                         })
                     })
 
