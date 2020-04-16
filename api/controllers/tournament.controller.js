@@ -490,6 +490,16 @@ exports.rollout_payment = async (req, res) => {
         }
 
         const participents = tournament.participents || [];
+        const tournamentPrize = tournament.prize || [];
+        let perKillAmount = 0;
+
+        tournamentPrize.forEach((prizeMetaItem = {}) => {
+            if (prizeMetaItem.key == "Per Kill") {
+                perKillAmount = prizeMetaItem.value || 0;
+            }
+        })
+
+
         const rankWiseAmount = {};
 
         tournament.rank.forEach((rankItem) => {
@@ -497,10 +507,21 @@ exports.rollout_payment = async (req, res) => {
         })
 
         participents.forEach(async (item = {}) => {
-            const rank = item.result_meta.rank;
+            const resultMeta = item.result_meta || {};
+            const rank = resultMeta.rank;
+            const noOfKills = resultMeta.kill || 0;
+            const userId = item.user._id;
+            let winAmount = 0;
+
             if (rank) {
-                const userId = item.user._id;
-                const winAmount = rankWiseAmount[rank];
+                winAmount += rankWiseAmount[rank] || 0;
+            }
+
+            if (noOfKills > 0 && perKillAmount > 0) {
+                winAmount += noOfKills * perKillAmount;
+            }
+
+            if (winAmount > 0) {
                 const walletTransaction = {
                     amount: winAmount,
                     target: "win_balance",
