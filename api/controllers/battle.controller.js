@@ -92,7 +92,9 @@ exports.find_queue_entry = async (req, res, next) => {
             created_by: {
                 $ne: userId,
             },
-            full: false
+            full: false,
+            deleted_at: { $ne: null },
+            payout_released: false
         }).exec();
         if (results.length > 0) {
             req.battleQueueEntry = results[0];
@@ -591,6 +593,7 @@ exports.get_joined_battle_queue = async (req, res) => {
             participents.forEach((item = {}) => {
                 const userEntry = item.user || {};
                 const userEntryId = userEntry._id;
+                console.log('entry', entry._id, 'userId', userId, 'userEntryId', userEntryId, "==", userEntryId == userId)
                 if (userId == userEntryId) {
                     got = true;
                 }
