@@ -93,7 +93,7 @@ exports.find_queue_entry = async (req, res, next) => {
                 $ne: userId,
             },
             full: false,
-            deleted_at: { $ne: null },
+            deleted_at: { $eq: null },
             payout_released: false
         }).exec();
         if (results.length > 0) {
