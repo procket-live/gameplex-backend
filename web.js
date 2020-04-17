@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on('offline', ({ userId }) => {
-        onlineUsers[userId] = false;
+        delete onlineUsers[userId];
         io.emit('online_user_list', onlineUsers);
     });
 
