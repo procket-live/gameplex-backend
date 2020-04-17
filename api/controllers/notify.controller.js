@@ -57,6 +57,7 @@ exports.notify_to_tournament_participents = async (tournamentId, expect = []) =>
         }).exec();
 
     tournament = tournament || {};
+
     const participents = tournament.participents || [];
     const tokens = participents
         .map((participent = {}) => {
@@ -64,9 +65,11 @@ exports.notify_to_tournament_participents = async (tournamentId, expect = []) =>
             return user.firebase_token;
         })
 
+    console.log('tokens', tokens)
+
     notify(tokens, {
         title: "Tournament Rool Id and Password Set",
-        body: tournament_name + " tournament's room and password is set. your tournament is about to start. Get Ready!!!",
+        body: "Room and password is set. your tournament is about to start. Get Ready!!!",
         data: { route: "Tournament", value: tournamentId }
     });
 }
