@@ -7,7 +7,7 @@ function sendSMS(mobile, template) {
         mobiles: `91${mobile}`,
         authkey: authKey,
         route: 4,
-        sender: 'GAMEPX',
+        sender: "GAMEPX",
         message: encodeURIComponent(template),
         country: 91,
     };
@@ -21,6 +21,7 @@ function sendSMS(mobile, template) {
         },
         method: 'GET'
     };
+
 
     axios(options);
 }
