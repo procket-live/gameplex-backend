@@ -222,50 +222,44 @@ exports.add = (req, res) => {
         })
 }
 
-exports.edit = (req, res) => {
-    Tournament
-        .update({
-            _id: req.params.id
-        }, {
-            $set: req.body
+exports.edit = async (req, res) => {
+
+    try {
+        const tournamentId = req.params.id;
+
+        await Tournament.update({ _id: tournamentId }, { $set: req.body }).exec();
+        const tournament = await Tournament
+            .findById(tournamentId)
+            .populate('game')
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'platform'
+                }
+            })
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'game_meta.lookup_type',
+                }
+            })
+            .exec()
+
+        if (req.body.room_detail) {
+            Notify.notify_to_tournament_participents(tournamentId);
+        }
+
+        return res.status(201).json({
+            success: true,
+            response: tournament
         })
-        .exec()
-        .then(() => {
-            Tournament
-                .findById(req.params.id)
-                .populate('game')
-                .populate({
-                    path: 'game',
-                    populate: {
-                        path: 'platform'
-                    }
-                })
-                .populate({
-                    path: 'game',
-                    populate: {
-                        path: 'game_meta.lookup_type',
-                    }
-                })
-                .exec()
-                .then((tournament) => {
-                    res.status(201).json({
-                        success: true,
-                        response: tournament
-                    })
-                })
-                .catch((err) => {
-                    return res.status(200).json({
-                        success: false,
-                        response: err
-                    });
-                })
-        })
-        .catch((err) => {
-            return res.status(200).json({
-                success: false,
-                response: err
-            });
-        })
+
+    } catch (err) {
+        return res.status(200).json({
+            success: false,
+            response: err
+        });
+    }
 }
 
 exports.join_tournament = async (req, res, next) => {
