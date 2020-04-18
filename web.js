@@ -18,6 +18,7 @@ const ChatRoomUtils = require('./utils/chat-room.utils');
 let globalSocket;
 
 const onlineUsers = {};
+const clients = {}
 
 io.on("connection", (socket) => {
     globalSocket = socket;
@@ -25,6 +26,7 @@ io.on("connection", (socket) => {
 
     socket.on('online', ({ userId }) => {
         onlineUsers[userId] = true;
+        socket.userId = userId;
         io.emit('online_user_list', onlineUsers);
     });
 
@@ -50,7 +52,9 @@ io.on("connection", (socket) => {
 
 
     socket.on('disconnect', () => {
-
+        const userId = socket.userId;
+        delete onlineUsers[userId];
+        io.emit('online_user_list', onlineUsers);
     })
 
     socket.on('sendMessage', async ({ token, roomId, message, image }, callback) => {
