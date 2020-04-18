@@ -27,6 +27,7 @@ io.on("connection", (socket) => {
     socket.on('online', ({ userId }) => {
         onlineUsers[userId] = true;
         socket.userId = userId;
+        clients[socket.id] = userId;
         io.emit('online_user_list', onlineUsers);
     });
 
@@ -52,7 +53,7 @@ io.on("connection", (socket) => {
 
 
     socket.on('disconnect', () => {
-        const userId = socket.userId;
+        const userId = clients[socket.id];
         delete onlineUsers[userId];
         io.emit('online_user_list', onlineUsers);
     })

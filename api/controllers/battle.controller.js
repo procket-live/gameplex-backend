@@ -593,7 +593,6 @@ exports.get_joined_battle_queue = async (req, res) => {
             participents.forEach((item = {}) => {
                 const userEntry = item.user || {};
                 const userEntryId = userEntry._id;
-                console.log('entry', entry._id, 'userId', userId, 'userEntryId', userEntryId, "==", userEntryId == userId)
                 if (userId == userEntryId) {
                     got = true;
                 }
