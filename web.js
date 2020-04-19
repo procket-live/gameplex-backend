@@ -28,11 +28,13 @@ io.on("connection", (socket) => {
         onlineUsers[userId] = true;
         socket.userId = userId;
         clients[socket.id] = userId;
+        console.log('user_online', socket.id, userId, clients)
         io.emit('online_user_list', onlineUsers);
     });
 
     socket.on('offline', ({ userId }) => {
         delete onlineUsers[userId];
+        console.log('offline');
         io.emit('online_user_list', onlineUsers);
     });
 
@@ -54,7 +56,9 @@ io.on("connection", (socket) => {
 
     socket.on('disconnect', () => {
         const userId = clients[socket.id];
+        console.log('user disconnected', socket.id, userId)
         delete onlineUsers[userId];
+        console.log('user list', onlineUsers);
         io.emit('online_user_list', onlineUsers);
     })
 

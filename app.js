@@ -4,7 +4,11 @@ const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
 mongoose.set('useCreateIndex', true);
 const AdminBro = require('admin-bro')
-const AdminBroExpressjs = require('admin-bro-expressjs')
+const AdminBroExpressjs = require('admin-bro-expressjs');
+const Agenda = require('agenda');
+
+//Jobs
+const Jobs = require('./api/job/remove-unused-match');
 
 const userRoutes = require('./api/routes/user.route');
 const lookupTypeRoutes = require('./api/routes/lookup-type.route');
@@ -40,15 +44,26 @@ const chatModel = require('./api/models/chat-room.model');
 const appReleaseModel = require('./api/models/release.model');
 const withdrawRequestModel = require('./api/models/withdrawal-request.model');
 
+const MONGO_URL = 'mongodb+srv://gameplex-user:pg60EeT5o8NtQEDa@cluster0-jnmvx.mongodb.net/gameplex?retryWrites=true&w=majority';
+
 const app = express();
 AdminBro.registerAdapter(require('admin-bro-mongoose'))
+const agenda = new Agenda({ db: { address: MONGO_URL, collection: 'jobCollectionName' } });
+
 const yo = mongoose.connect(
-    process.env.MONGO || 'mongodb+srv://gameplex-user:pg60EeT5o8NtQEDa@cluster0-jnmvx.mongodb.net/gameplex?retryWrites=true&w=majority',
+    process.env.MONGO || MONGO_URL,
     {
         useNewUrlParser: true
     }
 ).then((db) => {
 })
+
+agenda.define('remove_unused_match', Jobs.remove_unused_match);
+
+(async function () { // IIFE to give access to async/await
+    await agenda.start();
+    await agenda.every('0 */1 * * *', 'remove_unused_match');
+})();
 
 const adminBro = new AdminBro({
     resources: [

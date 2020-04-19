@@ -28,6 +28,8 @@ function notify(tokens, { title, body, data }, collapseKey = '') {
     });
 }
 
+exports.notify = notify;
+
 exports.notify_to_users = async (userIds = [], { title, body, data }) => {
     const users = await User
         .find({
