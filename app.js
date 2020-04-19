@@ -6,6 +6,7 @@ mongoose.set('useCreateIndex', true);
 const AdminBro = require('admin-bro')
 const AdminBroExpressjs = require('admin-bro-expressjs');
 const Agenda = require('agenda');
+var Agendash = require('agendash');
 
 //Jobs
 const Jobs = require('./api/job/remove-unused-match');
@@ -143,6 +144,7 @@ app.use((req, res, next) => {
 
 app.use(adminBro.options.rootPath, adminBroRouter)
 
+app.use('/dash', Agendash(agenda));
 app.use('/user', userRoutes);
 app.use('/lookup', lookupTypeRoutes);
 app.use('/game', gameRoutes);

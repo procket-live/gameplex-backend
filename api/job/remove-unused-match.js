@@ -7,19 +7,19 @@ const Participent = require('../models/participent.model');
 //Utils
 const Notify = require('../controllers/notify.controller');
 
-exports.remove_unused_match = async function (_, done) {
+exports.remove_unused_match = async function () {
     const yesterdayDate = moment().subtract('1', 'day').toDate();
 
     const battleQueue = await BattleQueue
         .find({
             completed: false,
             payout_released: false,
-            'scorecard.image_link': {
-                $eq: null
-            },
+            // 'scorecard.image_link': {
+            //     $eq: null
+            // },
             created_at: {
                 $lt: yesterdayDate
-            },
+            }
         })
         .populate({
             path: 'tournament',
@@ -59,8 +59,6 @@ exports.remove_unused_match = async function (_, done) {
             }
         })
     }
-
-    done();
 }
 
 // function Refund Partifipation Amount
