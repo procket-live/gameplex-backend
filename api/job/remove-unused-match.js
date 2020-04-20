@@ -6,6 +6,32 @@ const Participent = require('../models/participent.model');
 
 //Utils
 const Notify = require('../controllers/notify.controller');
+const Email = require('../../utils/send-email');
+
+exports.get_daily_report = async function () {
+    const nowDate = moment().toDate();
+    const yesterdayDate = moment().subtract('4', 'day').toDate();
+
+    const users = await User
+        .find({
+            created_at: {
+                $gt: yesterdayDate,
+                $lt: nowDate
+            }
+        })
+        .select('-_id name email mobile dob')
+        .exec();
+
+    let message = 'Daily User Signup Report!!! \n\n\n';
+
+    users.forEach((user = {}, index) => {
+        message += `\n ${index + 1}.\t\t\t${user.name}\t\t\t\t\t${user.email}\t\t\t\t\t${user.mobile}\t\t\t\t\t${moment(user.dob).format('DD MMM YYYY')}`
+    })
+    console.log('message', message);
+    // Email.send_email("hkxicor@gmail.com", "Daily Report", message);
+
+    Notify.notify('');
+}
 
 exports.remove_unused_match = async function () {
     const yesterdayDate = moment().subtract('1', 'day').toDate();

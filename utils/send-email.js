@@ -1,18 +1,14 @@
 const nodemailer = require("nodemailer");
 
 async function SendEmail(to, subject, text) {
-    let testAccount = await nodemailer.createTestAccount();
-
-    const config = {
-        host: "smtp.ethereal.email",
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
         port: 587,
-        secure: false,
         auth: {
-            user: testAccount.user,
-            pass: testAccount.pass
+            user: 'jovanny.king31@ethereal.email',
+            pass: 'KCVRJUpAJCd86nsZCe'
         }
-    }
-    const transporter = nodemailer.createTransport(config);
+    });
 
     return transporter.sendMail({
         from: 'admin@procket.live',
@@ -22,4 +18,4 @@ async function SendEmail(to, subject, text) {
     });
 }
 
-module.exports = SendEmail;
+exports.send_email = SendEmail;
