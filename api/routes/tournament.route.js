@@ -12,6 +12,7 @@ router.get('/my', checkAuth, TournamentController.get_my_tournaments);
 router.post('/join/:id', checkAuth, TournamentController.is_alredy_joined, TournamentController.join_tournament);
 router.post('/ranking/:id', checkAuth, TournamentController.set_ranking);
 router.get('/:id/participents', checkAuth, TournamentController.get_participents);
+router.post('/participents/update-score', checkAuth, TournamentController.update_score);
 router.get('/:id/rollout-payment', checkAuth, checkOrganizer, TournamentController.rollout_payment);
 router.get('/:id', checkAuth, TournamentController.get);
 router.post('/', checkAuth, TournamentController.add);

@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"gameplex.offers"}],"uuid":"522f06bf85ed4f96b58c5537aa789b72"}

@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"gameplex.organizers"},{"v":{"$numberInt":"2"},"unique":true,"key":{"user":{"$numberInt":"1"}},"name":"user_1","background":true,"ns":"gameplex.organizers"}],"uuid":"4d9b50007bf64c3f89e5d69bc4f51a04"}

@@ -17,10 +17,27 @@ exports.get_all = async (req, res) => {
     try {
         const result = await Battle
             .find({ active: true })
+            .sort({ 'rank': 1 })
             .populate('game')
             .populate('offers')
             .populate('instructions')
             .populate('match_list')
+            .populate({
+                path: 'tournament_list',
+                populate: {
+                    path: 'game'
+                }
+            })
+            .populate({
+                path: 'tournament_list',
+                populate: {
+                    path: 'participents',
+                    populate: {
+                        path: 'user',
+                        select: '_id name profile_image'
+                    }
+                }
+            })
             .exec();
 
         res.status(201).json({

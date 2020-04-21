@@ -262,6 +262,23 @@ exports.edit = async (req, res) => {
     }
 }
 
+exports.update_score = async (req, res) => {
+    const id = req.body.id;
+    const score = req.body.score;
+
+    try {
+        await Participent.findByIdAndUpdate(id, { result_meta: { score: score } });
+        return res.status(200).json({
+            success: true,
+        });
+    } catch (err) {
+        return res.status(200).json({
+            success: false,
+            response: err
+        });
+    }
+}
+
 exports.join_tournament = async (req, res, next) => {
     const userId = req.userData.userId;
     let tournamentId = req.params.id;

@@ -24,13 +24,11 @@ exports.get_daily_report = async function () {
 
     let message = 'Daily User Signup Report!!! \n\n\n';
 
-    users.forEach((user = {}, index) => {
-        message += `\n ${index + 1}.\t\t\t${user.name}\t\t\t\t\t${user.email}\t\t\t\t\t${user.mobile}\t\t\t\t\t${moment(user.dob).format('DD MMM YYYY')}`
-    })
-    console.log('message', message);
+    // users.forEach((user = {}, index) => {
+    //     message += `\n ${index + 1}.\t\t\t${user.name}\t\t\t\t\t${user.email}\t\t\t\t\t${user.mobile}\t\t\t\t\t${moment(user.dob).format('DD MMM YYYY')}`
+    // })
+    // console.log('message', message);
     // Email.send_email("hkxicor@gmail.com", "Daily Report", message);
-
-    Notify.notify('');
 }
 
 exports.remove_unused_match = async function () {
@@ -91,8 +89,8 @@ exports.remove_unused_match = async function () {
 async function RefundParticipationAmount(participent) {
     const id = participent._id;
     const userId = participent.user._id;
-    const amount = participent.wallet_transaction.amount;
-    const target = participent.wallet_transaction.amount;
+    const amount = Math.abs(participent.wallet_transaction.amount);
+    const target = participent.wallet_transaction.target;
 
     await Participent.findByIdAndUpdate(id, {
         deleted_at: Date.now()

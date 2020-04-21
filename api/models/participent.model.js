@@ -5,7 +5,7 @@ const participentSchema = mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', require: true },
     wallet_transaction: Object,
     tournament: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament' },
-    result_meta: { kills: String, rank: Number },
+    result_meta: { kills: String, rank: Number, score: Number },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
     deleted_at: { type: Date, default: null }

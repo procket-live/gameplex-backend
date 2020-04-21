@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"gameplex.withdrawalrequests"}],"uuid":"c239dfbc9a6b4ab28866a19e9ab5d5f1"}

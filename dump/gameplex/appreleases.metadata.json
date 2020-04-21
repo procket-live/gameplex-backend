@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"gameplex.appreleases"}],"uuid":"ec7bed414fa643c2b6f26512d2de42bf"}

@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"gameplex.battlequeues"}],"uuid":"05dc61d8a5bd428ba1361cadb97b0d47"}
