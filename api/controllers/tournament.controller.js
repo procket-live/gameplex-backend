@@ -267,7 +267,19 @@ exports.update_score = async (req, res) => {
     const score = req.body.score;
 
     try {
-        await Participent.findByIdAndUpdate(id, { result_meta: { score: score } });
+        const participent = await Participent.findById(id).select('-id_ result_meta').exec();
+        const resultMeta = participent.result_meta;
+        const bestScore = resultMeta.score || 0;
+
+        if (score < bestScore) {
+            return res.status(200).json({
+                success: true,
+            });
+        }
+
+        resultMeta.result_meta.score = score;
+
+        await Participent.findByIdAndUpdate(id, { result_meta: resultMeta });
         return res.status(200).json({
             success: true,
         });
