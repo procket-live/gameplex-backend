@@ -265,12 +265,11 @@ exports.edit = async (req, res) => {
 exports.update_score = async (req, res) => {
     const id = req.body.id;
     const score = req.body.score;
-
+    console.log(id, score);
     try {
-        const participent = await Participent.findById(id).select('-id_ result_meta').exec();
+        const participent = await Participent.findById(id).select('-_id result_meta').exec();
         const resultMeta = participent.result_meta;
         const bestScore = resultMeta.score || 0;
-
         if (score < bestScore) {
             return res.status(200).json({
                 success: true,
