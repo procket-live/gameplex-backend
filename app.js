@@ -10,6 +10,7 @@ var Agendash = require('agendash');
 
 //Jobs
 const Jobs = require('./api/job/remove-unused-match');
+const TournamentJobs = require('./api/job/tournament-job');
 
 const userRoutes = require('./api/routes/user.route');
 const lookupTypeRoutes = require('./api/routes/lookup-type.route');
@@ -61,11 +62,15 @@ const yo = mongoose.connect(
 
 agenda.define('remove_unused_match', Jobs.remove_unused_match);
 agenda.define('get_daily_signup_report', Jobs.get_daily_report);
-Jobs.get_daily_report();
+agenda.define('create_daily_match', TournamentJobs.create_all_flappy_bird_tournament);
+agenda.define('complete_daily_match', TournamentJobs.complete_tournament);
+
 (async function () { // IIFE to give access to async/await
     await agenda.start();
-    await agenda.every('0 */1 * * *', 'remove_unused_match');
+    await agenda.every('0 */2 * * *', 'remove_unused_match');
     await agenda.every('0 0 * * *', 'get_daily_signup_report');
+    await agenda.every('* 6 * * *', 'get_daily_signup_report');
+    await agenda.every('5 6 * * *', 'get_daily_signup_report');
 })();
 
 const adminBro = new AdminBro({

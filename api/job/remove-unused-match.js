@@ -120,6 +120,8 @@ async function RefundParticipationAmount(participent) {
     return true;
 }
 
+exports.RefundParticipationAmount = RefundParticipationAmount;
+
 async function NotifyUserThatRoomIsDeleted(participents = [], tournament = {}) {
     const tournamentName = tournament.tournament_name;
     const tokens = participents.map((participent) => participent.user.firebase_token);

@@ -7,6 +7,7 @@ const tournamentSchema = mongoose.Schema({
     game: { type: mongoose.Schema.Types.ObjectId, ref: 'Game', require: true },
     name: String,
     tournament_name: String,
+    private: { type: Boolean, default: true },
     logo: String,
     description: String,
     prize: [{
@@ -34,6 +35,7 @@ const tournamentSchema = mongoose.Schema({
     payout_released: { type: Boolean, default: false },
     registration_closing: Date,
     tournament_start_time: Date,
+    tournament_end_time: Date,
     form_message: String,
     validation_message: String,
     room_detail: {

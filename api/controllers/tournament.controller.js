@@ -108,6 +108,8 @@ exports.get_upcoming = (req, res) => {
         filter['participents'] = { $contains: req.params.id }
     }
 
+    filter['private'] = false;
+
     Tournament
         .find(filter)
         .populate('game')
@@ -265,20 +267,18 @@ exports.edit = async (req, res) => {
 exports.update_score = async (req, res) => {
     const id = req.body.id;
     const score = req.body.score;
-    console.log(id, score);
     try {
         const participent = await Participent.findById(id).select('-_id result_meta').exec();
-        const resultMeta = participent.result_meta;
-        const bestScore = resultMeta.score || 0;
+        const resultMeta = parseInt(participent.result_meta);
+        const bestScore = parseInt(resultMeta.score || 0);
+
         if (score < bestScore) {
             return res.status(200).json({
                 success: true,
             });
         }
 
-        resultMeta.result_meta.score = score;
-
-        await Participent.findByIdAndUpdate(id, { result_meta: resultMeta });
+        await Participent.findByIdAndUpdate(id, { result_meta: { score: score } });
         return res.status(200).json({
             success: true,
         });
