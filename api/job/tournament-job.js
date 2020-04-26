@@ -5,6 +5,7 @@ const Tournament = require('../models/tournament.model');
 const RemoveUnUsedJob = require('./remove-unused-match');
 const Battle = require('../models/battle.model');
 const Participent = require('../models/participent.model');
+const Notify = require('../controllers/notify.controller');
 
 const GAMEPLEX_USER_ID = '5e8b820063a73d0017b149da';
 const GAME_ID = '5e9e08ce7060761dc9d78c18';
@@ -50,7 +51,7 @@ async function create_tournament_flappy_bird(tournamentName, entryFee, duration)
     });
 
     tournament.save();
-    await Battle.findByIdAndUpdate(BATTLE_ID).update({
+    await Battle.findByIdAndUpdate(BATTLE_ID, {
         $push: {
             tournament_list: _id
         }
@@ -58,7 +59,7 @@ async function create_tournament_flappy_bird(tournamentName, entryFee, duration)
 }
 
 exports.create_all_flappy_bird_tournament = async () => {
-    await Battle.findByIdAndUpdate(BATTLE_ID).update({
+    await Battle.findByIdAndUpdate(BATTLE_ID, {
         $set: {
             tournament_list: []
         }
@@ -72,11 +73,12 @@ exports.create_all_flappy_bird_tournament = async () => {
 }
 
 exports.complete_tournament = async () => {
-    await Battle.findByIdAndUpdate(BATTLE_ID).update({
+    await Battle.findByIdAndUpdate(BATTLE_ID, {
         $set: {
             tournament_list: []
         }
     });
+
 
     const tournaments = await Tournament.find({
         game: GAME_ID,
@@ -111,15 +113,7 @@ exports.complete_tournament = async () => {
                 const participent = tournamentObjectParticipents[j];
                 await RemoveUnUsedJob.RefundParticipationAmount(participent);
             }
-            NotifyAboutAmountRefund(participents, tournament);
-
-            await tournament.update({ _id: tournament.id }, {
-                $set: {
-                    status: "completed",
-                    ranking_set: true,
-                    payout_released: true
-                }
-            })
+            NotifyAboutAmountRefund(tournamentObjectParticipents, tournamentObject);
         } else {
             // relese payout and complete tournament
             const rankWiseParticipent = tournamentObjectParticipents.sort((a = {}, b = {}) => {
@@ -135,7 +129,7 @@ exports.complete_tournament = async () => {
                 }
             });
 
-            NotifyAmountMatchComplete(rankWiseParticipent, tournament);
+            NotifyAmountMatchComplete(rankWiseParticipent, tournamentObject);
 
             //set ranking
             for (let i = 0; i < rankWiseParticipent.length; i++) {
@@ -147,7 +141,7 @@ exports.complete_tournament = async () => {
             //release payout
             const rankWiseAmount = {};
 
-            tournament.rank.forEach((rankItem) => {
+            tournamentObject.rank.forEach((rankItem) => {
                 rankWiseAmount[rankItem.rank] = rankItem.amount;
             })
 
@@ -164,7 +158,7 @@ exports.complete_tournament = async () => {
 
                 if (winAmount > 0) {
                     const walletTransaction = {
-                        amount: winAmount,
+                        amount: Math.abs(winAmount),
                         target: "win_balance",
                         source: tournamentId,
                         source_name: "Tournament"
@@ -180,9 +174,15 @@ exports.complete_tournament = async () => {
                     }).exec();
                 }
             })
-
-            await Tournament.findByIdAndUpdate(tournamentId, { $set: { payout_released: true, status: "completed", ranking_set: true } })
         }
+
+        await Tournament.findByIdAndUpdate(tournamentId, {
+            $set: {
+                status: "completed",
+                ranking_set: true,
+                payout_released: true
+            }
+        }).exec();
     })
 
 }
