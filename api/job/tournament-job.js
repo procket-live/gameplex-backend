@@ -59,12 +59,6 @@ async function create_tournament_flappy_bird(tournamentName, entryFee, duration)
 }
 
 exports.create_all_flappy_bird_tournament = async () => {
-    await Battle.findByIdAndUpdate(BATTLE_ID, {
-        $set: {
-            tournament_list: []
-        }
-    });
-
     create_tournament_flappy_bird("Hopping Freeway", 0, 10);
     create_tournament_flappy_bird("Hopping Silver", 5, 10);
     create_tournament_flappy_bird("Hopping Gold", 10, 10);
