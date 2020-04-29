@@ -50,7 +50,7 @@ async function create_tournament_flappy_bird(tournamentName, entryFee, duration)
         created_by: GAMEPLEX_USER_ID
     });
 
-    tournament.save();
+    await tournament.save();
     await Battle.findByIdAndUpdate(BATTLE_ID, {
         $push: {
             tournament_list: _id
@@ -74,14 +74,19 @@ exports.complete_tournament = async () => {
     });
 
 
-    const tournaments = await Tournament.find({
-        game: GAME_ID,
-        created_by: GAMEPLEX_USER_ID,
-        private: true,
-        tournament_end_time: {
-            $lt: moment().toDate()
-        }
-    }).select('_id').exec();
+    const tournaments = await Tournament
+        .find({
+            game: GAME_ID,
+            created_by: GAMEPLEX_USER_ID,
+            status: "active",
+            private: true,
+            payout_released: false,
+            tournament_end_time: {
+                $lt: moment().toDate()
+            }
+        })
+        .select('_id')
+        .exec();
 
     tournaments.forEach(async (tournament) => {
         const tournamentId = tournament._id;

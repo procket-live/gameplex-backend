@@ -69,7 +69,7 @@ agenda.define('complete_daily_match', TournamentJobs.complete_tournament);
     await agenda.start();
     await agenda.every('0 */2 * * *', 'remove_unused_match');
     await agenda.every('0 0 * * *', 'get_daily_signup_report');
-    await agenda.every('0 12 * * *', 'create_daily_match');
+    await agenda.every('0 06 * * *', 'create_daily_match');
     await agenda.every('0 22 * * *', 'complete_daily_match');
 })();
 
