@@ -175,13 +175,15 @@ exports.complete_tournament = async () => {
             })
         }
 
-        await Tournament.findByIdAndUpdate(tournamentId, {
-            $set: {
-                status: "completed",
-                ranking_set: true,
-                payout_released: true
-            }
-        }).exec();
+        await Tournament
+            .findByIdAndUpdate(tournamentId, {
+                $set: {
+                    status: "completed",
+                    ranking_set: true,
+                    payout_released: true
+                }
+            })
+            .exec();
     })
 
 }
