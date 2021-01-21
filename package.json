@@ -40,7 +40,7 @@
         "querystring": "^0.2.0",
         "quickblox": "^2.12.7",
         "razorpay": "^2.0.6",
-        "socket.io": "^2.3.0",
+        "socket.io": "^2.4.0",
         "uniqid": "^5.2.0",
         "username-generator": "^1.1.0",
         "util": "^0.12.0"
